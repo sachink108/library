@@ -2,7 +2,7 @@
 
 // define the AngularJS application. Include the ngRoute and ngResource modules
 //var app = angular.module('libApp', ['ngRoute', 'ngResource', 'ui.bootstrap', 'ngAnimate']);
-var app = angular.module('libApp', ['ngRoute', 'ngResource', 'ngCookies']);
+var app = angular.module('libApp', ['ngRoute', 'ngResource', 'ngCookies', 'ui.bootstrap']);
 
 app.config(['$routeProvider', function ($routeProvider) {
 
