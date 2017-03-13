@@ -8,11 +8,27 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     $scope.toggle = true;
     $scope.showHide = "Show Categories";
     
+    $scope.name = "Sachin";
+    
     $scope.toggleCat = function() {
         $("#wrapper").toggleClass("toggled");
         $scope.showHide = $scope.showHide === "Show Categories" ? "Hide Categories" : "Show Categories";
     };
-      
+    
+    $scope.readURL = function(input) {
+        console.log("IN readURL");
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#blah').attr('src', e.target.result)
+                    .width(150)
+                    .height(200);
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
+    
     $scope.addBook = function() {
         console.log("Adding Book");
         
@@ -20,8 +36,6 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
           animation: $scope.animationsEnabled,
           templateUrl: 'addBook.html',
           controller: 'ModalInstanceCtrl',
-          //controllerAs: '$ctrl',
-          size: 'lg'
         });
         modalInstance.result.then(function (selectedItem) {
             
