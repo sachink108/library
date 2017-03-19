@@ -7,7 +7,7 @@ import logging
 import sqlite3
 from URIParser import *
 
-database = "G:\\SachinK\progs\sqlite3\databases\users.db";
+database = "G:\\SachinK\progs\sqlite3\databases\library.db";
 create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         id INTEGER PRIMARY KEY,
                                         name text NOT NULL,

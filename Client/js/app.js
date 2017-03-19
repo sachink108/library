@@ -12,7 +12,6 @@ app.config(['$routeProvider', function ($routeProvider) {
             templateUrl: 'html/login.html',
             hideMenus: true
         })
- 
         .when('/home', {
             controller: 'HomeController',
             templateUrl: 'html/home.html'
@@ -33,7 +32,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         // keep user logged in after page refresh
         $rootScope.globals = $cookieStore.get('globals') || {};
         if ($rootScope.globals.currentUser) {
-            console.log("GLobals current user");
+            //console.log("GLobals current user");
             //$http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata; // jshint ignore:line
         }
  

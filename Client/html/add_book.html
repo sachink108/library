@@ -1,8 +1,8 @@
 <div ng-controller="HomeController">
     <label for="Title">Title</label>
-    <input name="title" id="title" type="text" />
+    <input ng-model="title" name="title" id="title" type="text" />
     <label for="Author">Author</label>
-    <input name="author" id="author" type="text"/>
-    <input type='file' onchange="angular.element(this).scope().readURL(this)" />
-    <img id="blah" src="#" alt="book image" />
+    <input ng-model="author" name="author" id="author" type="text"/>
+    <input ng-model='img_file' type='file' id="img_file" onchange="angular.element(this).scope().readURL(this)" />
+    <img id="blah" src="#" alt="Book Image Preview" />
 </div>

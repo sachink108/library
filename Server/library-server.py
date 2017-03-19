@@ -10,6 +10,7 @@ from glob import glob
 import threading
 from LoginHandler import *
 from NewUserHandler import *
+from AddBookHandler import *
 
 parser=argparse.ArgumentParser("Library backend")
 parser.add_argument("--project-root", required=True)
@@ -42,6 +43,9 @@ application = tornado.web.Application([
     
     # NewUserHandler.py
     ,(r"/newuser/(.*)"        , NewUserHandler)
+    
+    # AddBookHandler.py
+    ,(r"/addbook/(.*)"        , AddBookHandler)
 ])
 
 application.listen(args.serverport)
