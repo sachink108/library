@@ -34,20 +34,3 @@ class LoginHandler(tornado.web.RequestHandler):
         else:
             status = 'error connecting to db or database does not exist'
         self.write({'status' : status})
-
-'''
-# /list        
-class ListHandler(tornado.web.RequestHandler):
-    def get(self):
-        logging.info("GET /list")
-        self.set_header("Access-Control-Allow-Origin", "*")
-        retobj = {}
-        for program in programs:
-            r=requests.get("http://ai-ml-dev.cloudapp.net/%s/getstatus" % program)
-            if r.status_code == requests.codes.ok:
-                retobj[program] = r.json()
-            else:
-                retobj[program] = {'status':'Not Running'}
-
-        self.write(retobj)
-'''
