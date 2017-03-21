@@ -34,11 +34,15 @@ class Userform(tornado.web.RequestHandler):
 class Upload(tornado.web.RequestHandler):
     def post(self):
         fileinfo = self.request.files['filearg'][0]
-        print "fileinfo is", fileinfo
+        #print ("fileinfo is", fileinfo)
         fname = fileinfo['filename']
+        title = self.get_body_argument("author", default=None, strip=False)
+        author = self.get_body_argument("title", default=None, strip=False)
+        print ("Author is " , author)
+        print ("Title is ", title)
         extn = os.path.splitext(fname)[1]
         cname = str(uuid.uuid4()) + extn
-        fh = open(__UPLOADS__ + cname, 'w')
+        fh = open(__UPLOADS__ + cname, 'wb')
         fh.write(fileinfo['body'])
         self.finish(cname + " is uploaded!! Check %s folder" %__UPLOADS__)
 
@@ -63,7 +67,10 @@ if __name__ == "__main__":
 <form enctype="multipart/form-data" action="/upload" method="post">
 File: <input type="file" name="filearg" />
 <br />
-<br />
+Title: <input name="title" id="title" type="text" />
+<br/>
+Author: <input name="author" id="author" type="text" />
+<br/>
 <input type="submit" value="upload" />
 </form>
 '''
