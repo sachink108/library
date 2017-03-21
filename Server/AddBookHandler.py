@@ -17,6 +17,61 @@ create_books_table = """ CREATE TABLE IF NOT EXISTS books (
                                     ); """
                                     
 # /addbook/
+#https://technobeans.com/2012/09/17/tornado-file-uploads/
+'''
+import tornado
+import tornado.ioloop
+import tornado.web
+import os, uuid
+
+__UPLOADS__ = "uploads/"
+
+class Userform(tornado.web.RequestHandler):
+    def get(self):
+        self.render("fileuploadform.html")
+
+
+class Upload(tornado.web.RequestHandler):
+    def post(self):
+        fileinfo = self.request.files['filearg'][0]
+        print "fileinfo is", fileinfo
+        fname = fileinfo['filename']
+        extn = os.path.splitext(fname)[1]
+        cname = str(uuid.uuid4()) + extn
+        fh = open(__UPLOADS__ + cname, 'w')
+        fh.write(fileinfo['body'])
+        self.finish(cname + " is uploaded!! Check %s folder" %__UPLOADS__)
+
+
+application = tornado.web.Application([
+        (r"/", Userform),
+        (r"/upload", Upload),
+        ], debug=True)
+
+
+if __name__ == "__main__":
+    application.listen(8888)
+    tornado.ioloop.IOLoop.instance().start()
+
+<html>
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+<title>Upload Form</title>
+</head>
+<body>
+<p><h1>Select & Upload</h1></p>
+<form enctype="multipart/form-data" action="/upload" method="post">
+File: <input type="file" name="filearg" />
+<br />
+<br />
+<input type="submit" value="upload" />
+</form>
+'''
+
+
+
+
+
 class AddBookHandler(tornado.web.RequestHandler):
     def post(self, book_details):
         self.set_header("Access-Control-Allow-Origin", "*")
