@@ -19,6 +19,7 @@ args=parser.parse_args()
 logging.basicConfig(level=logging.INFO)
 sys.path.append(args.project_root)
 
+database_dir = "C:\\databases"
 # /
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -35,18 +36,32 @@ logging.info("Library web server starting up on port %d" % args.serverport)
 logging.getLogger("requests").setLevel(logging.CRITICAL)
 print ("Library is ready\n")
 
+#<img src="http://localhost:8888/static/the_visitor.jpg" />
+settings = {
+    "static_path": os.path.join(os.path.dirname(__file__), database_dir),
+}
+
 application = tornado.web.Application([
     (r"/"                    , MainHandler)
-    ,(r"/quit"                , QuitHandler)
+    ,(r"/quit"               , QuitHandler)
     # LoginHandler.py
-    ,(r"/auth/(.*)"           , LoginHandler)
+    ,(r"/auth/(.*)"          , LoginHandler)
     
     # NewUserHandler.py
-    ,(r"/newuser/(.*)"        , NewUserHandler)
+    ,(r"/newuser/(.*)"       , NewUserHandler)
     
     # AddBookHandler.py
-    ,(r"/addbook/(.*)"        , AddBookHandler)
+    ,(r"/addbook"            , AddBookHandler)
+    #(r"/upload"             , Upload),
 ])
 
 application.listen(args.serverport)
 tornado.ioloop.IOLoop.instance().start()
+
+#useful links
+'''
+https://technobeans.com/2012/09/17/tornado-file-uploads/
+http://www.encodedna.com/angularjs/tutorial/angularjs-file-upload-using-http-post-formdata-webapi.htm
+http://stackoverflow.com/questions/16483873/angularjs-http-post-file-and-form-data
+http://tutsnare.com/post-form-data-using-angularjs/
+'''

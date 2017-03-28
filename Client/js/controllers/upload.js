@@ -13,6 +13,7 @@ app.directive('fileModel', ['$parse', function ($parse) {
     };
 }]);
 
+/*
 app.service('fileUpload', function ($http) {
     this.uploadFileToUrl = function(file, uploadUrl){
         var fd = new FormData();
@@ -30,7 +31,7 @@ app.service('fileUpload', function ($http) {
         });
     };
 });
-
+*/
 app.controller('uploadController', ['$scope', 'fileUpload', function($scope, fileUpload){
     $scope.uploadFile = function(){
         var file = $scope.myFile;

@@ -7,7 +7,7 @@ app.factory('AuthenticationService',
         var service = {};
 
         service.Login = function (username, password, callback) {
-           $http({method:'GET', url:'http://sachin-vaio:9000/auth/name='+username+',password='+password, timeout: 5000})
+           $http({method:'GET', url:'http://localhost:9000/auth/username='+username+',password='+password, timeout: 5000})
                 .success(function(data, status, headers, config) {
                 callback(data)
             }).error(function(data, status, headers, config) {

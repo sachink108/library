@@ -9,7 +9,9 @@ import tornado.websocket
 import logging
 import sqlite3
 from URIParser import *
-database = "G:\\SachinK\progs\sqlite3\databases\users.db";
+
+database_dir = "C:\\databases"
+users_db = os.path.join(database_dir, "users.db")
 
 # /auth/username=name;password=pass
 class LoginHandler(tornado.web.RequestHandler):
@@ -17,14 +19,14 @@ class LoginHandler(tornado.web.RequestHandler):
         self.set_header("Access-Control-Allow-Origin", "*")
         logging.info("GET /auth")
         print ("Received creds" + creds)
-        global database
+        global users_db
         uriparser = URIParser()
-        r = uriparser.parse(creds)
+        r = uriparser.parse(creds)['dict']
         status = ''
-        conn = sqlite3.connect(database)
+        conn = sqlite3.connect(users_db)
 
         if conn is not None:
-            q = "SELECT id FROM users WHERE name='%s' AND password='%s';" % (r['dict']['name'],r['dict']['password'])
+            q = "SELECT id FROM users WHERE username='%s' AND password='%s';" % (r['username'],r['password'])
             print (q)
             cursor  = conn.cursor().execute(q)
             if (cursor.fetchone()):

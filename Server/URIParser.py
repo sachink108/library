@@ -17,7 +17,7 @@ class URIParser:
             [k,v]=kv
             if len(k) == 0 or len(v) == 0:
                 return {'status':'error','message':'invalid request'}
-            if ret_dict.has_key(k):
+            if k in ret_dict:
                 return {'status':'error','message':'repeated parameter:' + k}
             ret_dict[k]=v
         return {'status':'success','dict':ret_dict}
