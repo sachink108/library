@@ -1,43 +1,49 @@
 'use strict';
 
-app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieStore', '$http', function ($scope, $rootScope, $uibModal, $cookieStore, $http) {
+app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieStore', '$http', 'LibraryService',
+ function ($scope, $rootScope, $uibModal, $cookieStore, $http, LibraryService) {
     var globals = $cookieStore.get('globals');
     $scope.username = globals.currentUser.username;
     $scope.toggle = false;
     $scope.showHide = "Show Categories";
-    $scope.catetories = [];
     $scope.books = [];
+    $scope.categories = [];
+    $scope.allBooks = [];
     $scope.displayText = "Recently Added Books";
     
-    $scope.getCategories = function() {
-        console.log("get categories");
-        // $htt get here
-        $scope.categories = [{"name" : "Action", "count": 20},
-                        {"name" : "Spiritual", "count": 12},
-                        {"name" : "Autobiography", "count": 5},
-                        {"name" : "Thriller", "count": 10},
-                        ];
+    $scope.deleteBook = function(title, author) {
+        console.log("In delete book");
+    };
+    
+    $scope.editBook = function(title, author) {
+        console.log("In Edit Book");
+        $scope.showEditFields = true;
     };
     
     $scope.getBooks = function(category) {
-        if (category === '') {
-            // get recently added books
-            console.log("getting recently added books");
-        } else {
-            $scope.displayText = category + " Books";
-            // http get books on categories
-            console.log("getting books of category " + category);
-        }
-        
-        $scope.books = [
-            {"author" : "Lee Child",
-            "title" : "The Visitor",
-            "img": "sachin/f866bc97-3068-488d-b48f-22cf6007a203.jpg"},
-            {"author" : "Sidney Sheldon",
-            "title" : "Master of the Game",
-            "img": "sachin/0576b851-89b6-4d82-ae3a-8b28d53613fd.jpg"},
-            ];
-    };
+        $http({method:'GET', 
+               url:'http://localhost:9000/getbooks', 
+               timeout: 5000}
+              )
+              .success(function(data, status, headers, config) {
+                // the digest cycle calls this function several timss
+                // dont know how to get around that
+                $scope.books = [];
+                $scope.allBooks = data.catWiseBooks;
+                $scope.categories = [];
+                for (var cat in data.catWiseBooks) {
+                    $scope.categories.push({"name" : cat, "count": data.catWiseBooks[cat].length});
+                }
+                if (category === '') {
+                    $scope.books = $scope.books = data.recent.recent;
+                } else {
+                    $scope.displayText = category + " Books";
+                    $scope.books = data.catWiseBooks[category];
+                }
+            }).error(function(data, status, headers, config) {
+                console.log("error");
+            });
+    };// end getBooks()
     
     $scope.toggleCat = function() {
         $("#wrapper").toggleClass("toggled");
@@ -59,8 +65,20 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
         });
     };
     
-    $scope.getCategories();
-    $scope.getBooks('');
+   $scope.getBooks('');
+   /*
+    // tried to do something like this to circumvent
+    // the effect of the digest cycle which calls
+    // getBooks() repeatedly, but it did not work
+    LibraryService.GetBooks(function(response) {
+        console.log(response);
+        if(response.status) {
+            console.log("inCallback");
+        } else {
+            console.log("Could not getBooks");
+        }
+    });
+    */
 }]);
 
 app.directive('ngFiles', ['$parse', function ($parse) {

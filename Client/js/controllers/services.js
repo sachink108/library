@@ -123,3 +123,23 @@ app.factory('Base64', function () {
  
     /* jshint ignore:end */
 });
+
+app.factory('LibraryService',
+    ['$http', '$rootScope', '$timeout',
+    function ($http, $rootScope, $timeout) {
+        var service = {};
+
+        service.GetBooks = function (callback) {
+           $http({method:'GET', url:'http://localhost:9000/getbooks',timeout: 5000})
+                .success(function(data, status, headers, config) {
+                console.log("SUCCESS in LIbrary Service");
+                callback(data);
+                return data;
+            }).error(function(data, status, headers, config) {
+                console.log("Failure in Library Service");
+                console.log("error");
+            });
+        };
+        
+        return service;
+    }])

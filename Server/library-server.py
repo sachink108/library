@@ -11,6 +11,7 @@ import threading
 from LoginHandler import *
 from NewUserHandler import *
 from AddBookHandler import *
+from GetBooksHandler import *
 
 parser=argparse.ArgumentParser("Library backend")
 parser.add_argument("--project-root", required=True)
@@ -52,8 +53,11 @@ application = tornado.web.Application([
     
     # AddBookHandler.py
     ,(r"/addbook"            , AddBookHandler)
+    
+    # GetBooksHandler.py
+    ,(r"/getbooks"            , GetBooksHandler)
     #(r"/upload"             , Upload),
-])
+], **settings)
 
 application.listen(args.serverport)
 tornado.ioloop.IOLoop.instance().start()
