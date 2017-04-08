@@ -55,7 +55,7 @@ application = tornado.web.Application([
     ,(r"/addbook"            , AddBookHandler)
     
     # GetBooksHandler.py
-    ,(r"/getbooks"            , GetBooksHandler)
+    ,(r"/getbooks/(.*)"      , GetBooksHandler)
     #(r"/upload"             , Upload),
 ], **settings)
 

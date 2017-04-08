@@ -21,24 +21,33 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     };
     
     $scope.getBooks = function(category) {
+        var cat = '';
+        if(category === '') {
+            cat = 'recent';
+            $scope.displayText = "Recently Added Books";
+        } else {
+            cat = category;
+            $scope.displayText = category + " Books";
+        }
+        var url = 'http://localhost:9000/getbooks/user='+$scope.username+',cat='+cat;
+        console.log(url);
         $http({method:'GET', 
-               url:'http://localhost:9000/getbooks', 
+               url:url,
                timeout: 5000}
               )
               .success(function(data, status, headers, config) {
                 // the digest cycle calls this function several timss
                 // dont know how to get around that
                 $scope.books = [];
-                $scope.allBooks = data.catWiseBooks;
                 $scope.categories = [];
-                for (var cat in data.catWiseBooks) {
-                    $scope.categories.push({"name" : cat, "count": data.catWiseBooks[cat].length});
+                for (var cat in data.categories) {
+                    var catobj = data.categories[cat];
+                    $scope.categories.push({"name" : catobj.name, "count": catobj.count});
                 }
-                if (category === '') {
-                    $scope.books = $scope.books = data.recent.recent;
-                } else {
-                    $scope.displayText = category + " Books";
-                    $scope.books = data.catWiseBooks[category];
+                for (var cat in data.books) {
+                    for (var book in data.books[cat]) {
+                        $scope.books.push(data.books[cat][book]);
+                    }
                 }
             }).error(function(data, status, headers, config) {
                 console.log("error");

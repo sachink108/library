@@ -15,8 +15,8 @@ class AddBookHandler(tornado.web.RequestHandler):
         self.set_header("Access-Control-Allow-Origin", "*")
         #print (self.request.files)
         username = self.get_body_argument("username", default=None, strip=False)
-        title = self.get_body_argument("author", default=None, strip=False)
-        author = self.get_body_argument("title", default=None, strip=False)
+        title = self.get_body_argument("title", default=None, strip=False)
+        author = self.get_body_argument("author", default=None, strip=False)
         category = self.get_body_argument("category", default=None, strip=False)
         fileinfo = self.request.files['0'][0]
         filename = fileinfo['filename']
@@ -40,9 +40,9 @@ class AddBookHandler(tornado.web.RequestHandler):
                         ); """ 
         conn.cursor().execute(create_books_table)
         if conn is not None:
-            q = "INSERT INTO books (title, author, category, img_filename) VALUES ('%s', '%s', '%s', '%s');" % (title,author,category,cname)
+            q = "INSERT INTO books (title, author, category, img_filename) VALUES (?,?,?,?);"
             print (q)
-            conn.cursor().execute(q)
+            conn.cursor().execute(q,(title,author,category,cname))
             conn.commit()
             status = "OK"
         else:
