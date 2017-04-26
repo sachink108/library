@@ -27,7 +27,7 @@ class GetBooksHandler(tornado.web.RequestHandler):
         user_db = os.path.join(user_dir, r['user'] + ".db")
         conn = sqlite3.connect(user_db)
         if (r['cat'] == 'recent'):
-            q = "SELECT * FROM books ORDER BY timestamp LIMIT 10";
+            q = "SELECT * FROM books ORDER BY timestamp DESC LIMIT 5";
         else:
             q = "SELECT * FROM books WHERE category='%s' ORDER BY timestamp DESC" % r['cat']
         cursor = conn.cursor().execute(q)
