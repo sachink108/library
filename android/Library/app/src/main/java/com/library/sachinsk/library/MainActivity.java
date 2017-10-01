@@ -272,8 +272,9 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 URL url = new URL("http://10.0.2.2:9000/addbook");
+                //URL url = new URL("http://192.168.1.4:9000/addbook");
                 JSONObject postDataParams = new JSONObject();
-                postDataParams.put("username", "Sachin");
+                postDataParams.put("username", "sachin");
                 postDataParams.put("title", mTitle);
                 postDataParams.put("author", mAuthor);
                 postDataParams.put("category", mCat);
