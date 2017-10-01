@@ -3,17 +3,16 @@ import sys
 import uuid
 import json
 import tornado.ioloop
+import time
 import tornado.web
 import logging
 import sqlite3
-#from PIL import Image
 import base64
 import datetime
 from URIParser import *
 from elasticsearch import Elasticsearch
 
 database_dir = "C:\\databases"
-
 gClient = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 gElasticIndex = "books"
 
@@ -45,8 +44,9 @@ class AddBookHandler(tornado.web.RequestHandler):
         docType = username + gElasticIndex
         properties = {"title": {"type": "text"},
                       "author": {"type": "text"},
-                      "image": {"type": "binary", "index": "false"},
-                      "timestamp": {"type": "string"}
+                      "image_filepath": {"type": "text", "index": "false"},
+                      "timestamp": {"type": "date", "format" : "epoch_millis"},
+                      "h_timestamp": {"type": "text"}
                       }
         if gClient.indices.exists(index="books"):
             if not gClient.indices.exists_type(index=gElasticIndex, doc_type=docType):
@@ -76,11 +76,18 @@ class AddBookHandler(tornado.web.RequestHandler):
 
         filepath = self._saveImage(self.request) # should return an error is image is not provided, can chck this in js?
         docType = self._createIndexDocTypeMapping(username)
+        current_milli_time = lambda: int(round(time.time() * 1000))
+        curTime = current_milli_time()
+        #hCurTime =  datetime.datetime.fromtimestamp(curTime/1000.0).strftime('%Y-%m-%dT%H:%M:%S')
+        hCurTime = datetime.datetime.fromtimestamp(curTime / 1000.0).strftime("%A, %d. %B %Y %I:%M %p")
+
         _body = {'title': title,
                  'author': author,
                  'category': category,
                  'image_filepath': filepath,
-                 'timestamp': datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
+                 #'timestamp': datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
+                 'timestamp':curTime,
+                 "h_timestamp": hCurTime
                  }
         elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, id=uuid.uuid4(), body=_body)
         print(elasticResp)

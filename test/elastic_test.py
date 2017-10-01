@@ -95,14 +95,53 @@ catWiseBooks = {
 
 res = requests.get('http://localhost:9200')
 #print(res.content)
+#exit(1)
 images_dir = "c:\\databases\sachin\\bkup"
 client = Elasticsearch([{'host': 'localhost', 'port':9200}])
 
 _id = 0
-elasticIndex = 'books_new'
-doc_type = 'sachin.books'
+elasticIndex = 'books'
+doc_type = 'sachinbooks'
+user = "sachin"
 
 def addBooks():
+    if client.indices.exists(index="books"):
+        if client.indices.exists_type(index="books", doc_type=user+".books"):
+            print ("index and mapping both exist") #add content
+        else:
+            print ("index exists, adding mapping")
+            request_body = {
+                    user+".books": {
+                        "properties": {
+                            "title": {"type": "string"},
+                            "author": {"type": "string"},
+                            "category": {"type": "list"},
+                            "image": {"type": "string", "index": "no"},
+                            "date_added": {"type": "string"}
+                        }
+                }
+            }
+            client.indices.put_mapping(index="books", doc_type="sachin.books", body=request_body)
+    else: #index does not exist, create index and mapping
+        print("Adding index and mapping")
+        request_body = {
+            "settings": {
+                "number_of_shards": 5,
+                "number_of_replicas": 1
+            },
+            'mappings': {
+                user+".books": {
+                    "properties": {
+                        "title": {"type": "string"},
+                        "author": {"type": "string"},
+                        "image": {"type": "string", "index": "no"},
+                        "date_added": {"type": "string"}
+                    }
+                }}
+        }
+        client.indices.create(index='books', body=request_body)
+
+    return
     for cat in catWiseBooks:
         print (cat)
         for book in catWiseBooks[cat]:
@@ -129,13 +168,51 @@ def getBooks():
                     }
                 }
             }
+    _body = {
+        "sort": {"timestamp": "asc"},
+        "size": 5
+    }
+    _body = {
+        "sort": {"timestamp": "asc"},
+        "query": {
+            "query_string": {
+                "query": "crime,drama",
+                "fields": ["category"]
+            }
+        }
+    }
+
+    database_dir = "C:\\databases"
     elasticResp = client.search(index=elasticIndex, doc_type=doc_type, body=_body)
-    #print(elasticResp)
+    print(elasticResp)
     if (elasticResp['hits']['total']):
-        #print (elasticResp['hits']['hits'])
         for book in elasticResp['hits']['hits']:
-            #print (book)
+            print (book)
             print (book['_source']['title'])
-            print(str(book['_source']['image']))
+            imagePath = book['_source']['image_filepath']
+            print (os.path.relpath(imagePath, database_dir))
+            print(imagePath)
+            imagePath.replace(database_dir, '')
+            print (imagePath)
+
+            # get count of all categories (not handling multi category
+    _body = {
+               "size": 0,
+                "aggs": {
+                    "distinct_categories": {
+                        "terms": {
+                            "field": "category.keyword",
+                            "size": 1000
+                        }
+                    }
+                }
+            }
+    elasticResp = client.search(index=elasticIndex, doc_type=doc_type, body=_body)
+    print (elasticResp)
+    for cat in elasticResp["aggregations"]["distinct_categories"]["buckets"]:
+        print (cat["key"] + "\t" + str(cat["doc_count"]))
+
+
 #addBooks()
 getBooks()
+
