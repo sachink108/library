@@ -6,12 +6,87 @@ import tornado.ioloop
 import tornado.web
 import logging
 import sqlite3
-from PIL import Image
+#from PIL import Image
 import base64
+import datetime
 from URIParser import *
+from elasticsearch import Elasticsearch
 
 database_dir = "C:\\databases"
 
+gClient = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+gElasticIndex = "books"
+
+class AddBookHandler(tornado.web.RequestHandler):
+    def _saveImage(self, request):
+        username = self.get_body_argument("username", default=None, strip=False)
+        userdir = username + "_es"
+        userdir = os.path.join(database_dir, userdir)
+
+        if not os.path.exists(userdir):
+            os.makedirs(userdir)
+
+        if (len(self.request.files.keys()) > 0): #desktop
+            fileinfo = self.request.files['0'][0]
+            filename = fileinfo['filename']
+            imgData = fileinfo['body']
+        else: #mobile
+            filename = str(uuid.uuid4()) + ".jpg"
+            imgData = self.get_body_argument("0", default=None, strip=False)
+            imgData = base64.decodebytes(bytes(imgData, 'utf-8'))
+
+        ofile = os.path.join(userdir, filename)
+        fh = open(ofile, 'wb')
+        fh.write(imgData)
+
+        return ofile
+
+    def _createIndexDocTypeMapping(self, username):
+        docType = username + gElasticIndex
+        properties = {"title": {"type": "text"},
+                      "author": {"type": "text"},
+                      "image": {"type": "binary", "index": "false"},
+                      "timestamp": {"type": "string"}
+                      }
+        if gClient.indices.exists(index="books"):
+            if not gClient.indices.exists_type(index=gElasticIndex, doc_type=docType):
+                print("index exists, adding mapping")
+                request_body = { docType: {
+                                    "properties": properties
+                                    }
+                                }
+                gClient.indices.put_mapping(index="books", doc_type=docType, body=request_body)
+        else:  # index does not exist, create index and mapping
+            print("Adding index and mapping")
+            request_body = { "settings": {"number_of_shards": 5, "number_of_replicas": 1},
+                             'mappings': { docType: {
+                                            "properties": properties
+                                            }
+                                         }
+                            }
+            gClient.indices.create(index='books', body=request_body)
+        return docType
+
+    def post(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        username = self.get_body_argument("username", default=None, strip=False)
+        title = self.get_body_argument("title", default=None, strip=False)
+        author = self.get_body_argument("author", default=None, strip=False)
+        category = self.get_body_argument("category", default=None, strip=False)
+
+        filepath = self._saveImage(self.request) # should return an error is image is not provided, can chck this in js?
+        docType = self._createIndexDocTypeMapping(username)
+        _body = {'title': title,
+                 'author': author,
+                 'category': category,
+                 'image_filepath': filepath,
+                 'timestamp': datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
+                 }
+        elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, id=uuid.uuid4(), body=_body)
+        print(elasticResp)
+        self.finish({"status": "OK", "resp" : elasticResp})
+
+'''
 class AddBookHandler(tornado.web.RequestHandler):
     def post(self):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -62,3 +137,4 @@ class AddBookHandler(tornado.web.RequestHandler):
         else:
             status = "NOK"
         self.finish({"status" : status})
+'''
