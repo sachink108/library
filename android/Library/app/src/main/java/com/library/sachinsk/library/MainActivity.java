@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void showToast() {
             Context context = getApplicationContext();
-            CharSequence text = mTitle + " by " + mAuthor + " added to MyLibrary! under category" + mCat;
+            CharSequence text = mTitle + " by " + mAuthor + " added to MyLibrary! under category " + mCat;
             int duration = Toast.LENGTH_LONG;
             Toast toast = Toast.makeText(context, text, duration);
             toast.setGravity(Gravity.TOP | Gravity.CENTER, 0, 0);
