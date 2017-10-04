@@ -12,6 +12,7 @@ from LoginHandler import *
 from NewUserHandler import *
 from AddBookHandler import *
 from GetBooksHandler import *
+from SearchHandler import *
 
 parser=argparse.ArgumentParser("Library backend")
 parser.add_argument("--project-root", required=True)
@@ -56,6 +57,9 @@ application = tornado.web.Application([
     
     # GetBooksHandler.py
     ,(r"/getbooks/(.*)"      , GetBooksHandler)
+
+    # SearchHandler.py
+    ,(r"/search/(.*)"        , SearchHandler)
     #(r"/upload"             , Upload),
 ], **settings)
 

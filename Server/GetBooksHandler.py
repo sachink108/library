@@ -1,10 +1,4 @@
 import os
-import sys
-import json
-import time
-import requests
-import tornado.ioloop
-import tornado.web
 import tornado.websocket
 import logging
 import sqlite3
@@ -102,6 +96,8 @@ class GetBooksHandler(tornado.web.RequestHandler):
                                       "img" : imagePath
                                     })
         #catret = self._getCategoryCounts(docType)
+
+        # This part has to be sent everytime? is it necessary?
         _body = {
             "size": 0,
             "aggs": {
