@@ -1,25 +1,69 @@
 'use strict';
 
-app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieStore', '$http', 'LibraryService',
- function ($scope, $rootScope, $uibModal, $cookieStore, $http, LibraryService) {
+app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieStore', '$http', 'LibraryService', '$route',
+ function ($scope, $rootScope, $uibModal, $cookieStore, $http, LibraryService, $route) {
     var globals = $cookieStore.get('globals');
     $scope.username = globals.currentUser.username;
-    $scope.toggle = false;
+    $scope.toggle = true;
     $scope.showHide = "Show Categories";
+    //$scope.showHide = "Hide Categories";
     $scope.books = [];
     $scope.categories = [];
     $scope.allBooks = [];
     $scope.displayText = "Recently Added Books";
+    $scope.searchData = {};
+    $scope.book_deleted = false;
+    $scope.currentCategory = '';
     
-    $scope.deleteBook = function(title, author) {
-        console.log("In delete book");
+    $scope.deleteBook = function(id, title, author) {
+        console.log("In delete book " + id);
+        var url = 'http://localhost:9000/delete/user='+$scope.username+',book_id='+id;
+        console.log(url);
+        $http({method:'POST',
+               url:url,
+               timeout: 5000}
+              )
+              .success(function(data, status, headers, config) {
+                if (data.status === "OK") {
+                    $scope.alert_text = "Deleted [" + title + " by " + author + "]";
+                    $scope.book_deleted = true;
+
+                    $route.reload();
+                    //console.log("current category is " + $scope.currentCategory);
+                    //$scope.getBooks($scope.currentCategory);
+                } else {
+                    console.log("eff");
+                }
+            }).error(function(data, status, headers, config) {
+                console.log("error");
+            });
+
     };
     
     $scope.editBook = function(title, author) {
         console.log("In Edit Book");
         $scope.showEditFields = true;
     };
-    
+
+    $scope.search = function() {
+        var url = 'http://localhost:9000/search/user='+$scope.username+',query_string='+$scope.searchData.querystring;
+        console.log(url);
+        $http({method:'GET',
+               url:url,
+               timeout: 5000}
+              )
+              .success(function(data, status, headers, config) {
+                $scope.books = [];
+                for (var book in data.books) {
+                    $scope.books.push(data.books[book]);
+                }
+            }).error(function(data, status, headers, config) {
+                console.log("error");
+            });
+
+        $scope.displayText = "Search results for '" + $scope.searchData.querystring + "'";
+    };
+
     $scope.getBooks = function(category) {
         var cat = '';
         if(category === '') {
@@ -29,6 +73,8 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
             cat = category;
             $scope.displayText = category + " Books";
         }
+
+        $scope.currentCategory = cat;
         var url = 'http://localhost:9000/getbooks/user='+$scope.username+',cat='+cat;
         console.log(url);
         $http({method:'GET', 
@@ -52,11 +98,13 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
             }).error(function(data, status, headers, config) {
                 console.log("error");
             });
+
     };// end getBooks()
     
     $scope.toggleCat = function() {
         $("#wrapper").toggleClass("toggled");
         $scope.showHide = $scope.showHide === "Show Categories" ? "Hide Categories" : "Show Categories";
+        //$scope.showHide = $scope.showHide === "Hide Categories" ? "Show Categories" : "Hide Categories";
     };
 
     $scope.addBook = function() {
@@ -73,8 +121,9 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
             console.log('Modal dismissed at: ' + new Date());
         });
     };
-    
+
    $scope.getBooks('');
+
    /*
     // tried to do something like this to circumvent
     // the effect of the digest cycle which calls

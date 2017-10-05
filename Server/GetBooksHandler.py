@@ -93,6 +93,7 @@ class GetBooksHandler(tornado.web.RequestHandler):
                 imagePath.replace("\\", "/")
                 ret[category].append({"author": book['_source']['author'],
                                       "title": book['_source']['title'],
+                                      "id" : book['_id'],
                                       "img" : imagePath
                                     })
         #catret = self._getCategoryCounts(docType)

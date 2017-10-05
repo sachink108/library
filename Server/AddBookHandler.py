@@ -89,7 +89,8 @@ class AddBookHandler(tornado.web.RequestHandler):
                  'timestamp':curTime,
                  "h_timestamp": hCurTime
                  }
-        elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, id=uuid.uuid4(), body=_body)
+        #elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, id=uuid.uuid4(), body=_body)
+        elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, body=_body, id=None)
         print(elasticResp)
         self.finish({"status": "OK", "resp" : elasticResp})
 
