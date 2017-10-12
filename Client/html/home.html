@@ -3,27 +3,48 @@
 .my .glyphicon {
   pointer-events: all;
 }
-input[type=text_search] {
-    width: 130px;
-    height: 35px;
-    box-sizing: border-box;
-    border: 2px solid #ccc;
 
-    border-radius: 4px;
-    font-size: 16px;
-    background-color: white;
-    background-image: url('http://localhost:9000/static/images/search.png');
-    background-position: 0px 0px;
-    background-repeat: no-repeat;
-    padding: 12px 20px 12px 40px;
-    -webkit-transition: width 0.4s ease-in-out;
-    transition: width 0.4s ease-in-out;
+.btn-icon {
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  border-radius: 0;
+  &:active, &:focus {
+    .box-shadow(none);
+    border-color: transparent;
+  }
+  &:active {
+    .scale(0.9);
+  }
+  &:focus {
+    outline: 0 none !important;
+  }
+  .glyphicon {
+    .transition(color 0.1s ease);
+  }
 }
-input[type=text_search]:focus {
-    width: 60%;
-}
-.input-group .fa-search{
-  display: table-cell;
+
+// Define color for each button type
+@icon-default-color: #666;
+@icon-star-color: #FECF15;
+@icon-heart-color: #FE4365;
+@icon-bookmark-color: #A6D478;
+
+.btn-icon {
+.glyphicon-heart {
+    color: @icon-default-color;
+    &:hover {
+      color: fadeout(@icon-default-color, 15%);
+    }
+    &.active {
+      color: @icon-heart-color;
+      &:hover {
+        color: fadeout(@icon-heart-color, 15%);
+      }
+    }
+  }
 }
 </style>
 <div>
@@ -92,9 +113,11 @@ input[type=text_search]:focus {
                                 <img height="150" width="100" src="http://localhost:9000/static/{{book.img}}" class="img-responsive center-block" />
                                 <p>{{book.title}} by <br/>{{book.author}}</p>
                                 <p>
+                                    <button ng-click="toggleCurrent(book)" type="submit" class="btn btn-default btn-sm" style={{book.currentlyReadingButtonStyle}} title="Currently Reading"><span class="glyphicon glyphicon-book"></span></button>
+                                    <!--<button ng-click="toggleFavourite(book)" type="submit" class="btn btn-default btn-sm" ng-style={{book.favouriteButtonStyle}} title="Add to Favourites"><span class="glyphicon glyphicon-heart"></span></button>-->
+                                    <button-favorite></button-favorite>
                                     <button ng-click="editBook(book.title, book.author)" type="submit" class="btn btn-default btn-sm" style="border:none" title="Edit Book Details"><span class="glyphicon glyphicon-pencil "></span></button>
                                     <button ng-click="deleteBook(book.id, book.title, book.author)" type="submit" class="btn btn-default btn-sm" style="border:none" title="Delete Book"><span class="glyphicon glyphicon-trash"></span></button>
-                                    <button ng-click="addToFavourite(book.title, book.author)" type="submit" class="btn btn-default btn-sm" style="color:red;border:none" title="Add to Favourites"><span class="glyphicon glyphicon-heart"></span></button>
                                 </p>
                             </div>
                         </div>

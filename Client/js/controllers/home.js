@@ -14,7 +14,39 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     $scope.searchData = {};
     $scope.book_deleted = false;
     $scope.currentCategory = '';
-    
+
+    $scope.toggleFavourite = function(book) {
+        var newvalue = book.favourite === "true" ? "false" : "true";
+        book.favourite = newvalue; // update the current books fav value
+        var url = 'http://localhost:9000/update/user='+$scope.username+',book_id='+book.id+',field=favourite,value='+book.favourite;
+        console.log(url);
+        $http({method:'POST',
+               url:url,
+               timeout: 5000}
+              )
+              .success(function(data, status, headers, config) {
+                if (data.status === "OK") {
+                    book.favouriteButtonStyle = book.favourite === "true" ? {'color':'red','border':'none'} : {'color':'grey','border':'none'};
+                } else {
+                    console.log("eff");
+                }
+            }).error(function(data, status, headers, config) {
+                console.log("error");
+            });
+    };
+
+    $scope.toggleCurrent = function(book) {
+        console.log("In currentlyReading " + book.id);
+        // tornado call to add to favourite
+        console.log("currently Reading = " + book.currentlyReading);
+        if (book.currentlyReading === undefined || book.currentlyReading === false) {
+            book.currentlyReading = "true";
+            book.currentlyReadingButtonStyle = "color:blue;border:none";
+        } else {
+            book.currentlyReadingButtonStyle = "color:grey;border:none";
+            book.currentlyReading = false;
+        }
+    };
     $scope.deleteBook = function(id, title, author) {
         console.log("In delete book " + id);
         var url = 'http://localhost:9000/delete/user='+$scope.username+',book_id='+id;
@@ -27,7 +59,6 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
                 if (data.status === "OK") {
                     $scope.alert_text = "Deleted [" + title + " by " + author + "]";
                     $scope.book_deleted = true;
-
                     $route.reload();
                     //console.log("current category is " + $scope.currentCategory);
                     //$scope.getBooks($scope.currentCategory);
@@ -37,7 +68,6 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
             }).error(function(data, status, headers, config) {
                 console.log("error");
             });
-
     };
     
     $scope.editBook = function(title, author) {
@@ -60,7 +90,6 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
             }).error(function(data, status, headers, config) {
                 console.log("error");
             });
-
         $scope.displayText = "Search results for '" + $scope.searchData.querystring + "'";
     };
 
@@ -82,7 +111,7 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
                timeout: 5000}
               )
               .success(function(data, status, headers, config) {
-                // the digest cycle calls this function several timss
+                // the digest cycle calls this function several times
                 // dont know how to get around that
                 $scope.books = [];
                 $scope.categories = [];
@@ -92,6 +121,10 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
                 }
                 for (var cat in data.books) {
                     for (var book in data.books[cat]) {
+                        //console.log("Fav from db is " + data.books[cat][book].favourite);
+                        //data.books[cat][book].favouriteButtonStyle = data.books[cat][book].favourite === "true" ? "color:red;border:none" : "color:grey;border:none";
+                        data.books[cat][book].favouriteButtonStyle = data.books[cat][book].favourite === "true" ? {'color':'red','border':'none'} : {'color':'grey','border':'none'};
+                        data.books[cat][book].currentlyReadingButtonStyle = data.books[cat][book].current === "true" ? "color:blue;border:none" : "color:grey;border:none";
                         $scope.books.push(data.books[cat][book]);
                     }
                 }
@@ -137,7 +170,32 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
         }
     });
     */
+
+    $scope.item = {
+        star: false,
+        favorite: false,
+        bookmark: false
+  };
 }]);
+
+app.directive('buttonFavorite', function() {
+    return {
+        scope: true,
+        restrict: 'E',
+        //<button ng-click="toggleFavourite(book)" type="submit" class="btn btn-default btn-sm" ng-style={{book.favouriteButtonStyle}} title="Add to Favourites"><span class="glyphicon glyphicon-heart"></span></button>-->
+        //template: '<button class="btn btn-icon"><span class="glyphicon glyphicon-heart" ng-class="{active: item.favorite}"></span></button>', // not needed
+        //template: '<button class="btn btn-icon"><span class="glyphicon glyphicon-heart" ng-class="{active: item.favorite}" ng-style="book.favouriteButtonStyle"></span></button>', // works
+        template: '<button class="btn btn-icon"><span class="glyphicon glyphicon-heart" ng-style="book.favouriteButtonStyle"></span></button>',
+        link: function(scope, elem, attrs) {
+            elem.bind('click', function() {
+                scope.$apply(function(){
+                    scope.toggleFavourite(scope.book);
+                    //console.log("after toggle book fav = " + scope.book.favourite);
+                });
+            });
+        }
+    };
+});
 
 app.directive('ngFiles', ['$parse', function ($parse) {
     function fn_link(scope, element, attrs) {
