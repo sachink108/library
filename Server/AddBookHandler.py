@@ -45,6 +45,8 @@ class AddBookHandler(tornado.web.RequestHandler):
         properties = {"title": {"type": "text"},
                       "author": {"type": "text"},
                       "image_filepath": {"type": "text", "index": "false"},
+                      "favourite": {"type": "text" },
+                      "current" : {"type": "text"},
                       "timestamp": {"type": "date", "format" : "epoch_millis"},
                       "h_timestamp": {"type": "text"}
                       }
@@ -87,7 +89,9 @@ class AddBookHandler(tornado.web.RequestHandler):
                  'image_filepath': filepath,
                  #'timestamp': datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
                  'timestamp':curTime,
-                 "h_timestamp": hCurTime
+                 "h_timestamp": hCurTime,
+                 "favourite" : False,
+                 "current" : False,
                  }
         #elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, id=uuid.uuid4(), body=_body)
         elasticResp = gClient.index(index=gElasticIndex, doc_type=docType, body=_body, id=None)

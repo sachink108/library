@@ -95,13 +95,14 @@ images_dir = "c:\\databases\sachin\\bkup"
 for cat in catWiseBooks:
     print (cat)
     for book in catWiseBooks[cat]:
-        payload = { 'username': 'sachin', 
+        payload = { 'username': 'sachin',
                     'title': book['title'], 
                     'author': book['author'],
-                    'category' : cat,
+                    'category' : cat
                   } 
         image_file = os.path.join(images_dir, book['img'])
         files = {'0': open(image_file, 'rb')}
+        print ("Sending book")
         r = requests.post("http://localhost:9000/addbook", data=payload, files=files)
         print (r)
-        #input()
+        input()

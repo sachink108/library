@@ -212,7 +212,32 @@ def getBooks():
     for cat in elasticResp["aggregations"]["distinct_categories"]["buckets"]:
         print (cat["key"] + "\t" + str(cat["doc_count"]))
 
+def search():
+    _body = {
+        "sort": {"timestamp": "asc"},
+        "query": {
+            "query_string": {
+                "query": "lee"
+            }
+        }
+    }
+    elasticResp = client.search(index=elasticIndex, doc_type=doc_type, body=_body)
+    if (elasticResp['hits']['total']):
+        for book in elasticResp['hits']['hits']:
+            print (book)
+
+def update():
+    _body = {
+        "doc": {
+            "favourite": False
+        }
+    }
+    elasticResp = client.update(index=elasticIndex, doc_type="sachinbooks", body=_body, id="AV73l6og5hb-It3wc-3b")
+
 
 #addBooks()
-getBooks()
+#getBooks()
+#search()
+update()
+
 

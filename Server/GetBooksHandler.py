@@ -71,6 +71,26 @@ class GetBooksHandler(tornado.web.RequestHandler):
         #ret = self._getBooks(category, docType) #somehow this is not working
         if category == 'recent':
             _body = { "sort": {"timestamp": "desc"}, "size": 5 }
+        elif category == 'favorite':
+            _body = {
+                "sort": {"timestamp": "desc"},
+                "query": {
+                    "query_string": {
+                        "query": "true",
+                        "fields": ["favourite"]  # search in this field
+                    }
+                }
+            }
+        elif category == 'current':
+            _body = {
+                "sort": {"timestamp": "desc"},
+                "query": {
+                    "query_string": {
+                        "query": "true",
+                        "fields": ["current"]  # search in this field
+                    }
+                }
+            }
         else:
             _body = {
                 "sort": {"timestamp": "desc"},
@@ -94,10 +114,11 @@ class GetBooksHandler(tornado.web.RequestHandler):
                 ret[category].append({"author": book['_source']['author'],
                                       "title": book['_source']['title'],
                                       "id" : book['_id'],
-                                      "img" : imagePath
+                                      "img" : imagePath,
+                                      "favourite" : book['_source']['favourite'],
+                                      "current": book['_source']['current']
                                     })
         #catret = self._getCategoryCounts(docType)
-
         # This part has to be sent everytime? is it necessary?
         _body = {
             "size": 0,
@@ -116,41 +137,3 @@ class GetBooksHandler(tornado.web.RequestHandler):
             catret.append({'name': cat["key"], 'count': cat["doc_count"]})
         self.write({'books': ret,
                     'categories': catret})
-'''
-class GetBooksHandler(tornado.web.RequestHandler):
-    def get(self, info):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        logging.info("GET /getbooks")
-        global users_db
-        global database_dir
-        uriparser = URIParser()
-        r = uriparser.parse(info)['dict']
-        print ("Getting books for %s of category %s" %(r['user'], r['cat']))
-        
-        user_dir = os.path.join(database_dir, r['user'])
-        user_db = os.path.join(user_dir, r['user'] + ".db")
-        conn = sqlite3.connect(user_db)
-        if (r['cat'] == 'recent'):
-            q = "SELECT * FROM books ORDER BY timestamp DESC LIMIT 5";
-        else:
-            q = "SELECT * FROM books WHERE category='%s' ORDER BY timestamp DESC" % r['cat']
-        cursor = conn.cursor().execute(q)
-        ret = {}
-        for row in cursor.fetchall():
-            cat = row[3]
-            if (cat not in ret):
-                ret[cat] = []
-            ret[cat].append( {"author" : row[1],
-                              "title" : row[2],
-                               "img": "%s/%s" % (r['user'],row[4]),
-                              } )
-        
-        q = "SELECT category, count(*) FROM books GROUP BY category";
-        cursor = conn.cursor().execute(q)
-        catret = []
-        for row in cursor.fetchall():
-            catret.append({'name': row[0], 'count': row[1]})
-
-        self.write({'books': ret,
-                    'categories': catret})
-'''
