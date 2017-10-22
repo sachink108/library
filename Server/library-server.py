@@ -15,6 +15,7 @@ from GetBooksHandler import *
 from SearchHandler import *
 from DeleteBookHandler import *
 from UpdateBookHandler import *
+from AuthCodeHandler import *
 
 parser=argparse.ArgumentParser("Library backend")
 parser.add_argument("--project-root", required=True)
@@ -64,6 +65,7 @@ application = tornado.web.Application([
     ,(r"/search/(.*)"        , SearchHandler)
     ,(r"/delete/(.*)"        , DeleteBookHandler)
     ,(r"/update/(.*)"        , UpdateBookHandler)
+    ,(r"/storeauthcode"      , AuthCodeHandler)
 
     #(r"/upload"             , Upload),
 ], **settings)

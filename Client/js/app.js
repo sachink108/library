@@ -16,35 +16,41 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: 'HomeController',
             templateUrl: 'html/home.html'
         })
-        .when('/newuser', {
+        /*.when('/newuser', {
             controller: 'NewUserController',
             templateUrl: 'html/newuser.html'
+        })*/
+        .when('/signout', {
+            controller: 'LoginController',
+            templateUrl: 'html/login.html',
+            hideMenus: true
         })
         .when('/', {
             controller : 'LoginController',
             templateUrl: 'html/login.html'
         })
-        
         .otherwise({ redirectTo: '/login' });
 }])
 .run(['$rootScope', '$location', '$cookieStore', '$http',
     function ($rootScope, $location, $cookieStore, $http) {
+        console.log("In location change function");
         // keep user logged in after page refresh
-        $rootScope.globals = $cookieStore.get('globals') || {};
-        if ($rootScope.globals.currentUser) {
+        //$rootScope.globals = $cookieStore.get('globals') || {};
+        /*if ($rootScope.globals.currentUser) {
             //console.log("GLobals current user");
             //$http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata; // jshint ignore:line
-        }
+        }*/
  
         $rootScope.$on('$locationChangeStart', function (event, next, current) {
-            console.log("Redirecting ... " + $location.path());
-            // redirect to login page if not logged in
+            console.log("Redirecting to ... " + $location.path());
+            $location.path();
+            /*// redirect to login page if not logged in
             if ($location.path() == '/newuser') {
                 $location.path('/newuser');
-            } 
-            else if ($location.path() !== '/login' && !$rootScope.globals.currentUser) {
-            // redirect to login page if not logged in
-               $location.path('/login');
             }
+            else if ($location.path() !== '/login' && !$rootScope.globals.currentUser) {
+                console.log("redirect to login page if not logged in");
+                $location.path('/login');
+            }*/
         });
     }]);

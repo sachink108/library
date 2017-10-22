@@ -159,3 +159,120 @@ app.directive('file', function () {
         };
         */
         <!--<button type="submit" class="btn btn-primary">Submit</button>-->
+
+        /*
+app.controller('LoginController', ['$scope', '$http', '$rootScope', '$location', 'AuthenticationService',
+               function($scope, $http, $rootScope, $location, AuthenticationService) {
+    //AuthenticationService.ClearCredentials(); // reset login status
+    $scope.signedIn = false;
+
+    $scope.signInCallback = function(authResult) {
+        console.log("in function signInCallback()");
+            if (authResult['code']) {
+                // Hide the sign-in button now that the user is authorized, for example:
+                //$('#signinButton').attr('style', 'display: none');
+                console.log("AuthResult code = " + authResult['code']);
+
+                $http({ method: 'POST',
+                    url: "http://localhost:9000/storeauthcode",
+                    data: {'auth_code' : authResult['code']}, //}$scope.formdata,
+                    timeout: 5000,
+                    headers: { 'Content-Type' : undefined }
+                })
+                .success(function(data) {
+                    console.log(data);
+                    if(data.status === 'OK') {
+                        console.log("Saved creds");
+                        $scope.signedIn = true;
+                    }
+                    else {
+                        console.log("Could not save creds");
+                }
+                })
+                .error(function(data) {
+                    console.log("ERRRRR!");
+                });
+            } else {
+                console.log("Could not save auth code to server");
+                // There was an error.
+            }
+    };
+
+    $scope.signIn = function() {
+        console.log("Called signIn");
+        $scope.auth2.grantOfflineAccess().then($scope.signInCallback);
+    };
+
+    $scope.start = function() {
+        console.log("in function start()");
+        gapi.load('auth2', function() {
+            console.log("in gapi.load()");
+            $scope.auth2 = gapi.auth2.init({
+            //client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+            client_id:'416430916426-oghsnp3l7kn652a46kiavtqsf15g6bpj.apps.googleusercontent.com',
+            // Scopes to request in addition to 'profile' and 'email'
+            //scope: 'email'
+            });
+
+            console.log($scope.auth2);
+        });
+    };
+
+    $scope.start(); // call this in the beginning
+}]);
+*/
+
+/*
+function SignInController($scope) {
+    // This flag we use to show or hide the button in our HTML.
+    $scope.signedIn = false;
+
+    // Here we do the authentication processing and error handling.
+    // Note that authResult is a JSON object.
+    $scope.processAuth = function(authResult) {
+        // Do a check if authentication has been successful.
+        if(authResult['access_token']) {
+            // Successful sign in.
+            $scope.signedIn = true;
+
+            //     ...
+            // Do some work [1].
+            //     ...
+        } else if(authResult['error']) {
+            // Error while signing in.
+            $scope.signedIn = false;
+
+            // Report error.
+        }
+    };
+
+    // When callback is received, we need to process authentication.
+    $scope.signInCallback = function(authResult) {
+        $scope.$apply(function() {
+            $scope.processAuth(authResult);
+        });
+    };
+
+    // Render the sign in button.
+    $scope.renderSignInButton = function() {
+        gapi.signin.render('signInButton',
+            {
+                'callback': $scope.signInCallback, // Function handling the callback.
+                'clientid': '[CLIENT_ID from Google developer console]', // CLIENT_ID from developer console which has been explained earlier.
+                'requestvisibleactions': 'http://schemas.google.com/AddActivity', // Visible actions, scope and cookie policy wont be described now,
+                                                                                  // as their explanation is available in Google+ API Documentation.
+                'scope': 'https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email',
+                'cookiepolicy': 'single_host_origin'
+            }
+        );
+    }
+
+    // Start function in this example only renders the sign in button.
+    $scope.start = function() {
+        $scope.renderSignInButton();
+    };
+
+    // Call start function on load.
+    $scope.start();
+}
+*/

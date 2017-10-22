@@ -3,7 +3,6 @@ import sys
 from PIL import Image
 from pytesseract import image_to_string
 
-
 imgdir = "c:\databases\sachin"
 
 files = os.listdir(imgdir)

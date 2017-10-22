@@ -3,7 +3,24 @@
 app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieStore', '$http', 'LibraryService', '$route',
  function ($scope, $rootScope, $uibModal, $cookieStore, $http, LibraryService, $route) {
     var globals = $cookieStore.get('globals');
-    $scope.username = globals.currentUser.username;
+    //console.log(globals);
+    //$scope.username = globals.currentUser.username;
+
+    if (!$rootScope.globals) {
+        gapi.client.plus.people.get({
+                'userId': 'me'
+            }).then(function(res) {
+                console.log("User profile is ");
+                $scope.userProfile = res.result;
+                console.log($scope.userProfile);
+           });
+    } else {
+        $scope.userProfile = $rootScope.globals.userProfile;
+    }
+
+    $scope.username = $scope.userProfile.displayName;
+    $scope.displayImageURL = $scope.userProfile.image.url;
+
     $scope.inRefresh = false;
     $scope.showHide = "Show Categories";
     $scope.books = [];

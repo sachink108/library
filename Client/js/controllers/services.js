@@ -1,11 +1,12 @@
 'use strict';
- 
+
 //angular.module('Authentication')
 app.factory('AuthenticationService',
     ['Base64', '$http', '$cookieStore', '$rootScope', '$timeout',
     function (Base64, $http, $cookieStore, $rootScope, $timeout) {
         var service = {};
 
+/*
         service.Login = function (username, password, callback) {
            $http({method:'GET', url:'http://localhost:9000/auth/username='+username+',password='+password, timeout: 5000})
                 .success(function(data, status, headers, config) {
@@ -14,6 +15,7 @@ app.factory('AuthenticationService',
                 console.log("error");
             });
         };
+
         service.SetCredentials = function (username, password) {
             console.log("in set credentials");
             var authdata = Base64.encode(username + ':' + password);
@@ -34,12 +36,12 @@ app.factory('AuthenticationService',
             $cookieStore.remove('globals');
             //$http.defaults.headers.common.Authorization = 'Basic ';
         };
- 
+ */
         return service;
     }])
  
 app.factory('Base64', function () {
-    /* jshint ignore:start */
+    // jshint ignore:start
  
     var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
  
@@ -121,9 +123,11 @@ app.factory('Base64', function () {
         }
     };
  
-    /* jshint ignore:end */
+    //jshint ignore:end
 });
 
+
+// not sure if this is being used  - no not used
 app.factory('LibraryService',
     ['$http', '$rootScope', '$timeout',
     function ($http, $rootScope, $timeout) {

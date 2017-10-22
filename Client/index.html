@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
-
-  <head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/simple-sidebar.css">
-  </head>
+    <head>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="https://apis.google.com/js/client:platform.js"></script>
+        <meta name="google-signin-client_id" content="416430916426-oghsnp3l7kn652a46kiavtqsf15g6bpj.apps.googleusercontent.com"/>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/simple-sidebar.css">
+    </head>
 
   <body ng-app="libApp">
     <div ng-view></div>
@@ -32,7 +34,8 @@
     <script src="js/controllers/services.js"></script>
     <script src="js/controllers/home.js"></script>
     <script src="js/controllers/newuser.js"></script>
-    <!--<script src="js/vendor/canvas-to-blob.js"></script>-->
   </body>
 
+<!--<script src="https://apis.google.com/js/client:platform.js?onload=startApp"></script>-->
+<div data-ng-controller="LoginController" data-ng-init="startApp()"></div>
 </html>
