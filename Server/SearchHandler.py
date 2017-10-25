@@ -10,7 +10,6 @@ users_db = os.path.join(database_dir, "users.db")
 gClient = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 gElasticIndex = "books"
 
-
 class SearchHandler(tornado.web.RequestHandler):
     def get(self, info):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -33,11 +32,11 @@ class SearchHandler(tornado.web.RequestHandler):
         ret = []
         if elasticResp['hits']['total']:
             for book in elasticResp['hits']['hits']:
-                imagePath = book['_source']['image_filepath']
-                imagePath = os.path.relpath(imagePath, database_dir)
-                imagePath.replace("\\", "/")
+                #imagePath = book['_source']['image_filepath']
+                #imagePath = os.path.relpath(imagePath, database_dir)
+                #imagePath.replace("\\", "/")
                 ret.append({"author": book['_source']['author'],
                                       "title": book['_source']['title'],
-                                      "img": imagePath
+                                      "img": book['_source']['image_filepath'],
                                       })
         self.write({'books': ret})
