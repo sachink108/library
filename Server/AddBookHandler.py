@@ -38,15 +38,13 @@ class AddBookHandler(tornado.web.RequestHandler):
             return self._saveImageToS3(filename, imgData, user_id)
 
     def _saveImageToS3(self, filename, imgData, userId):
-        os.environ['AWS_ACCESS_KEY_ID'] = 'AKIAIE3SYMVMFVA7HT5A'
-        os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
-
         imgfilename = userId + "/" + filename
         #imgdata = open(image_file, 'rb')  # print (imgdata.readlines())
         s3 = boto3.resource('s3')
         s3.Bucket(gS3Bucket).put_object(Key=imgfilename, Body=imgData)
 
-        imgurl = "https://s3.amazonaws.com" + "/" + imgfilename;
+        imgurl = "https://s3.amazonaws.com" + "/" + gS3Bucket + "/" +imgfilename;
+        print (imgurl)
         return imgurl
 
     def _saveImageToLocal(self, filename, imgData, userId):
