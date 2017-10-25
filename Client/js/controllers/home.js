@@ -3,22 +3,12 @@
 app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieStore', '$http', 'LibraryService', '$route',
  function ($scope, $rootScope, $uibModal, $cookieStore, $http, LibraryService, $route) {
     var globals = $cookieStore.get('globals');
-    //console.log(globals);
-    //$scope.username = globals.currentUser.username;
+    console.log("In Home controller " + globals);
+    $scope.userProfile = globals.userProfile;
 
-    if (!$rootScope.globals) {
-        gapi.client.plus.people.get({
-                'userId': 'me'
-            }).then(function(res) {
-                console.log("User profile is ");
-                $scope.userProfile = res.result;
-                console.log($scope.userProfile);
-           });
-    } else {
-        $scope.userProfile = $rootScope.globals.userProfile;
-    }
-
-    $scope.username = $scope.userProfile.displayName;
+    $scope.displayName = $scope.userProfile.displayName;
+    $scope.username = $scope.displayName.replace(/ /g, '_');
+    $scope.userGoogleID = $scope.userProfile.id;
     $scope.displayImageURL = $scope.userProfile.image.url;
 
     $scope.inRefresh = false;
@@ -36,7 +26,8 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     $scope.toggleFavourite = function(book) {
         var newvalue = book.favourite === "true" ? "false" : "true";
         book.favourite = newvalue; // update the current books fav value
-        var url = 'http://localhost:9000/update/user='+$scope.username+',book_id='+book.id+',field=favourite,value='+book.favourite;
+        //var url = 'http://localhost:9000/update/user='+$scope.username+',book_id='+book.id+',field=favourite,value='+book.favourite;
+        var url = 'http://localhost:9000/update/user='+$scope.userGoogleID+',book_id='+book.id+',field=favourite,value='+book.favourite;
         console.log(url);
         $http({method:'POST', url:url, timeout: 5000})
               .success(function(data, status, headers, config) {
@@ -57,7 +48,7 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     $scope.toggleCurrent = function(book) {
         var newvalue = book.current === "true" ? "false" : "true";
         book.current = newvalue; // update the current books current value
-        var url = 'http://localhost:9000/update/user='+$scope.username+',book_id='+book.id+',field=current,value='+book.current;
+        var url = 'http://localhost:9000/update/user='+$scope.userGoogleID+',book_id='+book.id+',field=current,value='+book.current;
         console.log(url);
         $http({method:'POST', url:url, timeout: 5000})
               .success(function(data, status, headers, config) {
@@ -76,7 +67,7 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     };
 
     $scope.deleteBook = function(id, title, author) {
-        var url = 'http://localhost:9000/delete/user='+$scope.username+',book_id='+id;
+        var url = 'http://localhost:9000/delete/user='+$scope.userGoogleID+',book_id='+id;
         console.log(url);
         $http({method:'POST', url:url, timeout: 5000})
               .success(function(data, status, headers, config) {
@@ -98,7 +89,7 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     };
 
     $scope.search = function() {
-        var url = 'http://localhost:9000/search/user='+$scope.username+',query_string='+$scope.searchData.querystring;
+        var url = 'http://localhost:9000/search/user='+$scope.userGoogleID+',query_string='+$scope.searchData.querystring;
         console.log(url);
         $http({method:'GET', url:url, timeout: 5000})
               .success(function(data, status, headers, config) {
@@ -133,8 +124,6 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
     };
 
     $scope.getBooks = function(category) {
-    if (!$scope.inRefresh) {
-        $scope.inRefresh = true;
         var cat = '';
         if (category === '') {
             category = 'recent';
@@ -148,33 +137,35 @@ app.controller('HomeController', ['$rootScope','$scope', '$uibModal', '$cookieSt
         }
 
         $scope.currentCategory = category;
-        var url = 'http://localhost:9000/getbooks/user='+$scope.username+',cat='+category;
+        var url = 'http://localhost:9000/getbooks/user='+$scope.userGoogleID+',cat='+category;
         console.log(url);
         $http({method:'GET', url:url, timeout: 5000})
               .success(function(data, status, headers, config) {
-                // the digest cycle calls this function several times
-                // dont know how to get around that
-                $scope.books = [];
-                $scope.categories = [];
-                for (var cat in data.categories) {
-                    var catobj = data.categories[cat];
-                    $scope.categories.push({"name" : catobj.name, "count": catobj.count});
-                }
-                for (var cat in data.books) {
-                    for (var book in data.books[cat]) {
-                        //data.books[cat][book].favouriteButtonStyle = data.books[cat][book].favourite === "true" ? {'color':'red','border':'none'} : {'color':'grey','border':'none'};
-                        $scope.fav_count += setFavouriteButtonStyle(data.books[cat][book]);
-                        //data.books[cat][book].currentButtonStyle = data.books[cat][book].current === "true" ? {'color':'blue','border':'none'} : {'color':'grey','border':'none'};
-                        $scope.cur_count += setCurrentButtonStyle(data.books[cat][book]);
-                        $scope.books.push(data.books[cat][book]);
+                //if (data.status === 'OK') {
+                    // the digest cycle calls this function several times
+                    // dont know how to get around that
+                    $scope.books = [];
+                    $scope.categories = [];
+                    console.log(data.books);
+                    for (var cat in data.categories) {
+                        var catobj = data.categories[cat];
+                        $scope.categories.push({"name" : catobj.name, "count": catobj.count});
                     }
-                }
+                    for (var cat in data.books) {
+                        for (var book in data.books[cat]) {
+                            //data.books[cat][book].favouriteButtonStyle = data.books[cat][book].favourite === "true" ? {'color':'red','border':'none'} : {'color':'grey','border':'none'};
+                            $scope.fav_count += setFavouriteButtonStyle(data.books[cat][book]);
+                            //data.books[cat][book].currentButtonStyle = data.books[cat][book].current === "true" ? {'color':'blue','border':'none'} : {'color':'grey','border':'none'};
+                            $scope.cur_count += setCurrentButtonStyle(data.books[cat][book]);
+                            $scope.books.push(data.books[cat][book]);
+                        }
+                    }
+                //} else {
+                //    console.log("No Books found!!"); // shhow a div with apt message or something
+                //}
             }).error(function(data, status, headers, config) {
-                console.log("error");
+                console.log("some other error");
             });
-        $scope.inRefresh = false;
-    }
-
     };// end getBooks()
     
     $scope.toggleCat = function() {
@@ -279,7 +270,6 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http) 
     };
 
     $scope.getTheFiles = function ($files) {
-        console.log("IN GET THE FILES");
         console.log($files);
         angular.forEach($files, function (value, key) {
             $scope.formdata.append(key, value);
@@ -288,7 +278,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $http) 
     };
 
     $scope.ok = function () {
-        $scope.formdata.append("username", $scope.username);
+        $scope.formdata.append("user_id", $scope.userGoogleID);
         $scope.formdata.append("title", $scope.title);
         $scope.formdata.append("author", $scope.author);
         $scope.formdata.append("category", $scope.category);

@@ -1,13 +1,11 @@
 #!python
 import sys
+import os
 import argparse
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import logging
-import threading
-from glob import glob
-import threading
 from LoginHandler import *
 from NewUserHandler import *
 from AddBookHandler import *
@@ -19,6 +17,7 @@ from AuthCodeHandler import *
 
 parser=argparse.ArgumentParser("Library backend")
 parser.add_argument("--project-root", required=True)
+parser.add_argument("--mode", default="local")
 parser.add_argument("--serverport", type=int, default=9000)
 args=parser.parse_args()
 logging.basicConfig(level=logging.INFO)
@@ -36,10 +35,19 @@ class QuitHandler(tornado.web.RequestHandler):
         tornado.ioloop.IOLoop.instance().stop()
         self.write("quit library backend")
 
+# use a config file here to set the env variables
+if (args.mode == "local"):
+    os.environ['LIBRARY_IMAGE_STORE'] = 'LOCAL_STORE'
+
+if (args.mode == 'aws'):
+    os.environ['LIBRARY_IMAGE_STORE'] = 'AWS_STORE'
+
 # -- start
 logging.info("Library web server starting up on port %d" % args.serverport)
+logging.info("Library web server mode is %s" % args.mode)
+logging.info("Library image store is %s" % os.environ['LIBRARY_IMAGE_STORE'])
 logging.getLogger("requests").setLevel(logging.CRITICAL)
-print ("Library is ready\n")
+logging.info ("Library web server is up and running")
 
 #<img src="http://localhost:8888/static/the_visitor.jpg" />
 settings = {

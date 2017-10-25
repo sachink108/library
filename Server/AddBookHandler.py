@@ -11,37 +11,59 @@ import base64
 import datetime
 from URIParser import *
 from elasticsearch import Elasticsearch
+import boto3
 
 database_dir = "C:\\databases"
 gClient = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 gElasticIndex = "books"
+gS3Bucket = "my-library_1508745849196"
 
+#http://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html
 class AddBookHandler(tornado.web.RequestHandler):
     def _saveImage(self, request):
-        username = self.get_body_argument("username", default=None, strip=False)
-        userdir = username + "_es"
+        user_id = self.get_body_argument("user_id", default=None, strip=False)
+
+        if (len(self.request.files.keys()) > 0):  # desktop
+            fileinfo = self.request.files['0'][0]
+            filename = fileinfo['filename']
+            imgData = fileinfo['body']
+        else:  # mobile
+            filename = str(uuid.uuid4()) + ".jpg"
+            imgData = self.get_body_argument("0", default=None, strip=False)
+            imgData = base64.decodebytes(bytes(imgData, 'utf-8'))
+
+        if os.environ['LIBRARY_IMAGE_STORE'] == 'LOCAL_STORE':
+            return self._saveImageToLocal(filename, imgData, user_id)
+        else:
+            return self._saveImageToS3(filename, imgData, user_id)
+
+    def _saveImageToS3(self, filename, imgData, userId):
+        os.environ['AWS_ACCESS_KEY_ID'] = 'AKIAIE3SYMVMFVA7HT5A'
+        os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
+
+        imgfilename = userId + "/" + filename
+        #imgdata = open(image_file, 'rb')  # print (imgdata.readlines())
+        s3 = boto3.resource('s3')
+        s3.Bucket(gS3Bucket).put_object(Key=imgfilename, Body=imgData)
+
+        imgurl = "https://s3.amazonaws.com" + "/" + imgfilename;
+        return imgurl
+
+    def _saveImageToLocal(self, filename, imgData, userId):
+        userdir = userId + "_es"
         userdir = os.path.join(database_dir, userdir)
 
         if not os.path.exists(userdir):
             os.makedirs(userdir)
 
-        if (len(self.request.files.keys()) > 0): #desktop
-            fileinfo = self.request.files['0'][0]
-            filename = fileinfo['filename']
-            imgData = fileinfo['body']
-        else: #mobile
-            filename = str(uuid.uuid4()) + ".jpg"
-            imgData = self.get_body_argument("0", default=None, strip=False)
-            imgData = base64.decodebytes(bytes(imgData, 'utf-8'))
-
         ofile = os.path.join(userdir, filename)
         fh = open(ofile, 'wb')
         fh.write(imgData)
+        imageUrl = "http://localhost:9000/static/" + userId + "_es/" + filename #crap coding
+        return imageUrl
 
-        return ofile
-
-    def _createIndexDocTypeMapping(self, username):
-        docType = username + gElasticIndex
+    def _createIndexDocTypeMapping(self, user_id):
+        docType = user_id + gElasticIndex
         properties = {"title": {"type": "text"},
                       "author": {"type": "text"},
                       "image_filepath": {"type": "text", "index": "false"},
@@ -71,13 +93,14 @@ class AddBookHandler(tornado.web.RequestHandler):
 
     def post(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        username = self.get_body_argument("username", default=None, strip=False)
+        user_id = self.get_body_argument("user_id", default=None, strip=False)
         title = self.get_body_argument("title", default=None, strip=False)
         author = self.get_body_argument("author", default=None, strip=False)
         category = self.get_body_argument("category", default=None, strip=False)
 
         filepath = self._saveImage(self.request) # should return an error is image is not provided, can chck this in js?
-        docType = self._createIndexDocTypeMapping(username)
+        #docType = self._createIndexDocTypeMapping(user_id) # called in getBooks
+        docType = user_id + gElasticIndex
         current_milli_time = lambda: int(round(time.time() * 1000))
         curTime = current_milli_time()
         #hCurTime =  datetime.datetime.fromtimestamp(curTime/1000.0).strftime('%Y-%m-%dT%H:%M:%S')

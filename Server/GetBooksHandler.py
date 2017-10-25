@@ -1,7 +1,6 @@
 import os
 import tornado.websocket
 import logging
-import sqlite3
 from URIParser import *
 from elasticsearch import Elasticsearch
 
@@ -29,6 +28,7 @@ class GetBooksHandler(tornado.web.RequestHandler):
         for cat in elasticResp["aggregations"]["distinct_categories"]["buckets"]:
             catret.append({'name': cat["key"], 'count': cat["doc_count"]})
 
+    '''
     def _getBooks(self, category, docType):
         self.set_header("Access-Control-Allow-Origin", "*")
         if category == 'recent':
@@ -50,14 +50,42 @@ class GetBooksHandler(tornado.web.RequestHandler):
                 if category not in ret: # have to handle multi category
                     ret[category] = []
 
-                imagePath = book['_source']['image_filepath']
-                imagePath = os.path.relpath(imagePath, database_dir)
-                imagePath.replace("\\", "/")
+                #imagePath = book['_source']['image_filepath']
+                #imagePath = os.path.relpath(imagePath, database_dir)
+                #imagePath.replace("\\", "/")
                 ret[category].append({"author": book['_source']['author'],
                                       "title": book['_source']['title'],
                                       #"img": "%s/%s" % (r['user'], row[4]),
-                                      "img" : imagePath
+                                      "img" : book['_source']['image_filepath']
                                     })
+    '''
+
+    def _checkIndexDocTypeMapping(self, docType):
+        properties = {"title": {"type": "text"},
+                      "author": {"type": "text"},
+                      "image_filepath": {"type": "text", "index": "false"},
+                      "favourite": {"type": "text" },
+                      "current" : {"type": "text"},
+                      "timestamp": {"type": "date", "format" : "epoch_millis"},
+                      "h_timestamp": {"type": "text"}
+                      }
+        if gClient.indices.exists(index="books"):
+            if not gClient.indices.exists_type(index=gElasticIndex, doc_type=docType):
+                print("index exists, adding mapping")
+                request_body = { docType: {
+                                    "properties": properties
+                                    }
+                                }
+                gClient.indices.put_mapping(index="books", doc_type=docType, body=request_body)
+        else:  # index does not exist, create index and mapping
+            print("Adding index and mapping")
+            request_body = { "settings": {"number_of_shards": 5, "number_of_replicas": 1},
+                             'mappings': { docType: {
+                                            "properties": properties
+                                            }
+                                         }
+                            }
+            gClient.indices.create(index='books', body=request_body)
 
     def get(self,info):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -68,6 +96,7 @@ class GetBooksHandler(tornado.web.RequestHandler):
         category = r['cat']
         print("Getting books for %s of category %s" % (username, category))
         docType=username+gElasticIndex
+        self._checkIndexDocTypeMapping(docType)
         #ret = self._getBooks(category, docType) #somehow this is not working
         if category == 'recent':
             _body = { "sort": {"timestamp": "desc"}, "size": 5 }
@@ -107,33 +136,34 @@ class GetBooksHandler(tornado.web.RequestHandler):
             for book in elasticResp['hits']['hits']:
                 if category not in ret: # have to handle multi category
                     ret[category] = []
-
-                imagePath = book['_source']['image_filepath']
-                imagePath = os.path.relpath(imagePath, database_dir)
-                imagePath.replace("\\", "/")
+                #imagePath = book['_source']['image_filepath']
+                #imagePath = os.path.relpath(imagePath, database_dir)
+                #imagePath.replace("\\", "/")
                 ret[category].append({"author": book['_source']['author'],
                                       "title": book['_source']['title'],
                                       "id" : book['_id'],
-                                      "img" : imagePath,
+                                      "img" : book['_source']['image_filepath'],
                                       "favourite" : book['_source']['favourite'],
                                       "current": book['_source']['current']
                                     })
         #catret = self._getCategoryCounts(docType)
-        # This part has to be sent everytime? is it necessary?
+        # This part has to be sent everytime? is it necessary? seems so!
         _body = {
             "size": 0,
-            "aggs": {
+             "aggs": {
                 "distinct_categories": {
                     "terms": {
                         "field": "category.keyword",
                         "size": 1000
                     }
                 }
-            }
+             }
         }
         elasticResp = gClient.search(index=gElasticIndex, doc_type=docType, body=_body)
         catret = []
         for cat in elasticResp["aggregations"]["distinct_categories"]["buckets"]:
             catret.append({'name': cat["key"], 'count': cat["doc_count"]})
-        self.write({'books': ret,
+
+        self.write({'status': 'OK',
+                    'books': ret,
                     'categories': catret})

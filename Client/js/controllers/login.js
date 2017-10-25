@@ -22,8 +22,8 @@ app.controller('LoginController', ['$scope', '$http', '$rootScope', '$location',
 }]);
 */
 
-app.controller('LoginController', ['$scope', '$http', '$rootScope', '$location', 'AuthenticationService',
-               function($scope, $http, $rootScope, $location, AuthenticationService) {
+app.controller('LoginController', ['$scope', '$http', '$rootScope', '$cookieStore', '$location', 'AuthenticationService',
+               function($scope, $http, $rootScope, $cookieStore, $location, AuthenticationService) {
     $scope.auth2 = {};
     $scope.authResult;
 
@@ -37,6 +37,7 @@ app.controller('LoginController', ['$scope', '$http', '$rootScope', '$location',
 
     $scope.startApp = function(operation) {
         console.log("In Start App : " + operation);
+        // This part is dicey, not sure if it works well or at all
         if (operation === 'logoff') {
             if (gapi.auth2.getAuthInstance()) {
                 gapi.auth2.getAuthInstance().signOut();
@@ -105,7 +106,8 @@ app.controller('LoginController', ['$scope', '$http', '$rootScope', '$location',
             }).then(function(res) {
                 console.log("User profile is ");
                 $rootScope.globals = { userProfile : res.result};
-                console.log($rootScope.globals.userProfile);
+                $cookieStore.put('globals', $rootScope.globals);
+                //console.log($rootScope.globals.userProfile);
                 console.log("Sign in successfull, loading home page now");
                 $location.path('/home'); // if login is successfull, load this page
                 $scope.$apply(); // this works with the above
