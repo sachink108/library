@@ -1,0 +1,24 @@
+<div ng-controller="HomeController">
+<form enctype="multipart/form-data" ng-submit="ok()">
+    <div class="form-group">
+        <label>Title</label>
+        <input type="text" name="title" class="form-control" ng-model="title">
+        <span ng-show="errorName">{{errorName}}</span>
+    </div>
+    <div class="form-group">
+        <label>Author</label>
+        <input type="text" name="author" class="form-control" ng-model="author">
+        <span ng-show="errorName">{{errorName}}</span>
+    </div>
+    <div class="form-group">
+        <label>Category</label>
+        <input type="text" name="category" class="form-control" ng-model="category">
+        <span ng-show="errorName">{{errorName}}</span>
+    </div>
+    <div class="form-group">
+        <label>Image</label>
+        <input ng-files="getTheFiles($files)" id="file1" type="file" ng-model="filename" file="file" name="filearg" ng-model="book.image_file" onchange="angular.element(this).scope().readURL(this)" />
+        <img id="blah" src="#" alt="Book Image Preview" />
+    </div>
+</form>
+</div>

@@ -32,9 +32,6 @@ class SearchHandler(tornado.web.RequestHandler):
         ret = []
         if elasticResp['hits']['total']:
             for book in elasticResp['hits']['hits']:
-                #imagePath = book['_source']['image_filepath']
-                #imagePath = os.path.relpath(imagePath, database_dir)
-                #imagePath.replace("\\", "/")
                 ret.append({"author": book['_source']['author'],
                                       "title": book['_source']['title'],
                                       "img": book['_source']['image_filepath'],

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="https://apis.google.com/js/client:platform.js"></script>
+        <meta name="google-signin-client_id" content="416430916426-oghsnp3l7kn652a46kiavtqsf15g6bpj.apps.googleusercontent.com"/>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/simple-sidebar.css">
+    </head>
+
+  <body ng-app="libApp">
+    <div ng-view></div>
+   <!--<div class="jumbotron">-->
+    <!--<div>
+      <div class="container">
+        <div class="col-md-offset-2 col-md-8">
+          <div ng-view></div>
+        </div>
+      </div>
+    </div>
+    -->
+    <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.0/angular-cookies.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular-animate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular-route.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.6.2/angular-resource.js"></script>
+
+    <!-- below scripts required to make the home page user dropdown work -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+    <script src="js/app.js"></script>
+    <script src="js/controllers/login.js"></script>
+    <script src="js/controllers/services.js"></script>
+    <script src="js/controllers/home.js"></script>
+    <script src="js/controllers/profile.js"></script>
+    <!--<script src="js/controllers/newuser.js"></script>-->
+  </body>
+
+<!--<script src="https://apis.google.com/js/client:platform.js?onload=startApp"></script>-->
+<div data-ng-controller="LoginController" data-ng-init="startApp()"></div>
+</html>
