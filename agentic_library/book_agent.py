@@ -48,8 +48,8 @@ def _call_openai_api_mock(image_b64: str) -> str:
 def identify_book_details(image_path):
     image_bytes = read_image_file(image_path)
     image_b64 = base64.b64encode(image_bytes).decode()
-    # details = _call_openai_api(image_b64)
-    details = _call_openai_api_mock(image_b64)
+    details = _call_openai_api(image_b64)
+    # details = _call_openai_api_mock(image_b64)
     json_block = re.search(r"```json(.*?)```", details, re.S) 
     book_details = {}
     if json_block:
