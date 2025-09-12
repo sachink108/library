@@ -4,8 +4,8 @@ import streamlit as st
 from PIL import Image
 import io
 
-from library.db import save_book_to_db, get_books_from_db
-from library.book_agent import identify_book_details
+from agentic_library.db import save_book_to_db, get_books_from_db
+from agentic_library.book_agent import identify_book_details
 
 # Streamlit UI
 st.title("My Library")
