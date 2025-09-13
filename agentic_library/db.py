@@ -47,9 +47,7 @@ def get_books_from_db() -> list[Book]:
         books = [Book(uuid=row[0], title=row[1], author=row[2], 
                 tagline=row[3], genre=row[4], image=row[5]) for row in books]
 
-
     return books
-
 
 def delete_book_from_db(book_id) -> None:
     with sqlite3.connect(DB_PATH) as conn:
