@@ -1,0 +1,10 @@
+from pydantic import BaseModel, Field
+from typing import Optional
+
+class Book(BaseModel):
+    uuid: str = Field(..., description="Unique identifier for the book")
+    title: str = Field(..., description="Title of the book")
+    author: str = Field(..., description="Author of the book")
+    tagline: Optional[str] = Field(None, description="Tagline or short description of the book")
+    image: Optional[bytes] = Field(None, description="Image data as bytes")
+    genre: Optional[str] = Field(None, description="Genre or category of the book")

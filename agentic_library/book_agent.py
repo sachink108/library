@@ -4,6 +4,7 @@ import base64
 from dotenv import load_dotenv
 
 import json
+from agentic_library.schema import Book
 
 
 load_dotenv()
@@ -45,17 +46,17 @@ def _call_openai_api_mock(image_b64: str) -> str:
     ```
     """
 
-def identify_book_details(image_path):
+def identify_book_details(image_path) -> Book:
     image_bytes = read_image_file(image_path)
     image_b64 = base64.b64encode(image_bytes).decode()
-    details = _call_openai_api(image_b64)
-    # details = _call_openai_api_mock(image_b64)
+    # details = _call_openai_api(image_b64)
+    details = _call_openai_api_mock(image_b64)
     json_block = re.search(r"```json(.*?)```", details, re.S) 
     book_details = {}
     if json_block:
         book_details = json.loads(json_block.group(1).strip())
         book_details['image'] = image_b64
-    
-        return book_details
-    
+
+        return Book(**book_details)
+
     raise ValueError("No JSON block found in the response.")

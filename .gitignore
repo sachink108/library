@@ -6,3 +6,4 @@
 
 .streamlit
 **/*.db
+temp_uploaded_image.jpg
