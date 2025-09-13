@@ -9,6 +9,30 @@ from agentic_library.book_agent import identify_book_details
 from agentic_library.schema import Book
 from agentic_library.db import delete_book_from_db
 
+def _process_image(temp_path):
+    with st.spinner("Identifying book details...", show_time=True):
+        try:
+            book = identify_book_details(temp_path)
+            st.success("Book identified!")                
+            book.title = st.text_input("Title", value=book.title)
+            book.author = st.text_input("Author", value=book.author)
+            book.tagline = st.text_input("Tagline", value=book.tagline or "")
+            book.genre = st.text_input("Genre", value=book.genre or "")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                accept = st.button("Accept Book", key="accept_book",type="primary")
+            with col2:
+                reject = st.button("Reject Book", key="reject_book")
+
+            if accept:
+                save_book_to_db(book)
+                st.success("Book saved to database!")
+            elif reject:
+                st.info("Book addition cancelled.")
+        except Exception as e:
+            st.error(f"Error identifying book: {e}")
+        os.remove(temp_path)
 
 def _upload_book_cover():
     uploaded_file = st.file_uploader("Upload a book cover image", type=["jpg", "jpeg", "png"])
@@ -17,31 +41,7 @@ def _upload_book_cover():
         temp_path = "temp_uploaded_image.jpg"
         with open(temp_path, "wb") as f:
             f.write(image_bytes)
-        with st.spinner("Identifying book details...", show_time=True):
-            try:
-                book = identify_book_details(temp_path)
-                st.success("Book identified!")                
-                book.title = st.text_input("Title", value=book.title)
-                book.author = st.text_input("Author", value=book.author)
-                book.tagline = st.text_input("Tagline", value=book.tagline or "")
-                book.genre = st.text_input("Genre", value=book.genre or "")
-
-                col1, col2 = st.columns(2)
-                with col1:
-                    accept = st.button("Accept Book", key="accept_book",type="primary")
-                with col2:
-                    reject = st.button("Reject Book", key="reject_book")
-
-                if accept:
-                    save_book_to_db(book)
-                    st.stop()
-                    st.success("Book saved to database!")
-                elif reject:
-                    st.stop()
-                    st.info("Book addition cancelled.")
-            except Exception as e:
-                st.error(f"Error identifying book: {e}")
-        os.remove(temp_path)
+        _process_image(temp_path)
 
 def _manual_entry():
     title = st.text_input("Title")
@@ -65,17 +65,31 @@ def _manual_entry():
                         image=image_b64)
             save_book_to_db(book)
             st.success("Book saved to database!")
-            st.stop()
+            #st.stop()
+
+def _take_a_photo():
+    camera_photo = st.camera_input("Take a photo of the book cover")
+    if camera_photo is not None:
+        temp_path = "temp_camera_image.jpg"
+        with open(temp_path, "wb") as f:
+            f.write(camera_photo.getvalue())
+        _process_image(temp_path)
 
 @st.dialog("Add a Book")
 def add_book()-> None:
-    st.markdown("### Either upload a book cover image or enter book details manually below.")
-    manual_entry = st.checkbox("Enter details manually (skip image upload)")
-    if manual_entry:
-        _manual_entry()
-    else:
+    option = st.radio(
+        "Choose how to add a book:",
+        ["Take a photo", "Upload a photo", "Enter manually"],
+        horizontal=True,
+        help="You can either take a photo of the book cover, upload an image, or enter the details manually."
+    )
+    if option == "Take a photo":
+        _take_a_photo()
+    elif option == "Upload a photo":
         _upload_book_cover()
-
+    elif option == "Enter manually":
+        _manual_entry()
+    
 def display_book_image(book: Book):
     if book.image:
         image_data = base64.b64decode(book.image)
