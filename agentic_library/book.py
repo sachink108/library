@@ -9,6 +9,7 @@ from agentic_library.book_agent import identify_book_details
 from agentic_library.schema import Book
 from agentic_library.db import delete_book_from_db
 
+
 def _upload_book_cover():
     uploaded_file = st.file_uploader("Upload a book cover image", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
@@ -19,8 +20,7 @@ def _upload_book_cover():
         with st.spinner("Identifying book details...", show_time=True):
             try:
                 book = identify_book_details(temp_path)
-                st.success("Book identified!")
-                # Make fields editable
+                st.success("Book identified!")                
                 book.title = st.text_input("Title", value=book.title)
                 book.author = st.text_input("Author", value=book.author)
                 book.tagline = st.text_input("Tagline", value=book.tagline or "")
@@ -70,16 +70,20 @@ def _manual_entry():
 @st.dialog("Add a Book")
 def add_book()-> None:
     st.markdown("### Either upload a book cover image or enter book details manually below.")
-
     manual_entry = st.checkbox("Enter details manually (skip image upload)")
-
     if manual_entry:
         _manual_entry()
-        
     else:
         _upload_book_cover()
-        
 
+def display_book_image(book: Book):
+    if book.image:
+        image_data = base64.b64decode(book.image)
+        image = Image.open(io.BytesIO(image_data))
+        image.thumbnail((150, 300))
+        buf = io.BytesIO()
+        image.save(buf, format="PNG")
+        st.image(buf.getvalue(), width=150)
 
 @st.dialog("Book Details")
 def display_book_details(book: Book):
@@ -91,13 +95,7 @@ def display_book_details(book: Book):
         st.markdown(f"**Genre:** {book.genre}")
 
     with col2:
-        if book.image:
-            image_data = base64.b64decode(book.image)
-            image = Image.open(io.BytesIO(image_data))
-            image.thumbnail((150, 300))
-            buf = io.BytesIO()
-            image.save(buf, format="PNG")
-            st.image(buf.getvalue(), width=150)
+        display_book_image(book)
 
 @st.dialog("Edit Book Details")
 def edit_book_details(book: Book):

@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image
 import io
 
-from agentic_library.book import add_book, delete_book, display_book_details, edit_book_details
+from agentic_library.book import add_book, delete_book, display_book_details, edit_book_details, display_book_image
 from agentic_library.sidebar import show_sidebar
 from agentic_library.db import get_books_from_db
 
@@ -11,10 +11,6 @@ from agentic_library.db import get_books_from_db
 def login_screen():
     st.subheader("Please login with your Google account to continue.")
     st.button("Login with Google", on_click=st.login)
-
-# if not hasattr(st, "user") or not getattr(st.user, "is_logged_in", False):
-#     login_screen()
-#     st.stop()
     
 # Streamlit UI
 st.markdown("""
@@ -71,11 +67,6 @@ for idx, book in enumerate(books):
                 edit_book_details(book)
             if delete_col.button("🗑️", key=f"delete_btn_{idx}", help="Delete book"):
                 delete_book(book)
-        if book.image:
-            image_data = base64.b64decode(book.image)
-            image = Image.open(io.BytesIO(image_data))
-            image.thumbnail((100, 200))
-            buf = io.BytesIO()
-            image.save(buf, format="PNG")
-            st.image(buf.getvalue(), width='content')
+            display_book_image(book)
+
 
