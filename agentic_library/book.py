@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 import base64
+import uuid
 import io
 from PIL import Image
 from agentic_library.db import save_book_to_db, update_book
@@ -8,10 +9,7 @@ from agentic_library.book_agent import identify_book_details
 from agentic_library.schema import Book
 from agentic_library.db import delete_book_from_db
 
-
-
-@st.dialog("Add a Book")
-def add_book()-> None:
+def _upload_book_cover():
     uploaded_file = st.file_uploader("Upload a book cover image", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         image_bytes = uploaded_file.read()
@@ -44,6 +42,43 @@ def add_book()-> None:
             except Exception as e:
                 st.error(f"Error identifying book: {e}")
         os.remove(temp_path)
+
+def _manual_entry():
+    title = st.text_input("Title")
+    author = st.text_input("Author")
+    tagline = st.text_input("Tagline")
+    genre = st.text_input("Genre")
+    image_file = st.file_uploader("Book cover image (optional)", type=["jpg", "jpeg", "png"])
+    image_b64 = None
+    if image_file is not None:
+        image_bytes = image_file.read()
+        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+    if st.button("Add Book", key="manual_add_book", type="primary"):
+        if not title or not author:
+            st.error("Title and Author are required.")
+        else:
+            book = Book(uuid=str(uuid.uuid4()),
+                        title=title, 
+                        author=author, 
+                        tagline=tagline, 
+                        genre=genre, 
+                        image=image_b64)
+            save_book_to_db(book)
+            st.success("Book saved to database!")
+            st.stop()
+
+@st.dialog("Add a Book")
+def add_book()-> None:
+    st.markdown("### Either upload a book cover image or enter book details manually below.")
+
+    manual_entry = st.checkbox("Enter details manually (skip image upload)")
+
+    if manual_entry:
+        _manual_entry()
+        
+    else:
+        _upload_book_cover()
+        
 
 
 @st.dialog("Book Details")
