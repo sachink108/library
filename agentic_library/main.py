@@ -1,7 +1,4 @@
-import base64
 import streamlit as st
-from PIL import Image
-import io
 
 from agentic_library.book import add_book, delete_book, display_book_details, edit_book_details, display_book_image
 from agentic_library.sidebar import show_sidebar

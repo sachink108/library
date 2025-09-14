@@ -1,15 +1,13 @@
 import re
 import openai
 import base64
-from dotenv import load_dotenv
+import streamlit as st
 import uuid
 import json
 from agentic_library.schema import Book
 
 
-load_dotenv()
-# Set your OpenAI API key
-client = openai.OpenAI()  # Create a client instance
+client = openai.OpenAI(api_key=st.secrets["OPENAPI"]["OPENAI_API_KEY"])  # Create a client instance
 
 def read_image_file(image_path) -> bytes:
     with open(image_path, "rb") as f:
