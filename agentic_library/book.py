@@ -8,12 +8,15 @@ from agentic_library.db import save_book_to_db, update_book
 from agentic_library.book_agent import identify_book_details
 from agentic_library.schema import Book
 from agentic_library.db import delete_book_from_db
+import streamlit_cropper
 
-def _process_image(temp_path):
+def _process_image(temp_path, user_id: str):
     with st.spinner("Identifying book details...", show_time=True):
         try:
-            book = identify_book_details(temp_path)
-            st.success("Book identified!")                
+            book = identify_book_details(temp_path, user_id=user_id)
+            st.success("Book identified!")
+            book.user_id = user_id
+            st.markdown("### Please verify/update the details below:")             
             book.title = st.text_input("Title", value=book.title)
             book.author = st.text_input("Author", value=book.author)
             book.tagline = st.text_input("Tagline", value=book.tagline or "")
@@ -26,24 +29,27 @@ def _process_image(temp_path):
                 reject = st.button("Reject Book", key="reject_book")
 
             if accept:
-                save_book_to_db(book)
-                st.success("Book saved to database!")
+                save_book_to_db(book, user_id=user_id)
+                st.success("Book saved to database! Please refresh to see it.")
+                st.stop()
             elif reject:
                 st.info("Book addition cancelled.")
+                st.stop()
         except Exception as e:
             st.error(f"Error identifying book: {e}")
+        
         os.remove(temp_path)
 
-def _upload_book_cover():
+def _upload_book_cover(user_id: str):
     uploaded_file = st.file_uploader("Upload a book cover image", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         image_bytes = uploaded_file.read()
         temp_path = "temp_uploaded_image.jpg"
         with open(temp_path, "wb") as f:
             f.write(image_bytes)
-        _process_image(temp_path)
+        _process_image(temp_path, user_id)
 
-def _manual_entry():
+def _manual_entry(user_id: str):
     title = st.text_input("Title")
     author = st.text_input("Author")
     tagline = st.text_input("Tagline")
@@ -57,38 +63,55 @@ def _manual_entry():
         if not title or not author:
             st.error("Title and Author are required.")
         else:
-            book = Book(uuid=str(uuid.uuid4()),
+            print(user_id)
+            book = Book(user_id=user_id,
+                        uuid=str(uuid.uuid4()),
                         title=title, 
                         author=author, 
                         tagline=tagline, 
                         genre=genre, 
                         image=image_b64)
-            save_book_to_db(book)
-            st.success("Book saved to database!")
-            #st.stop()
+            save_book_to_db(book, user_id=user_id)
+            st.success("Book saved to database. Please refresh to see it.")
+            st.stop()
 
-def _take_a_photo():
+def _take_a_photo(user_id: str):
     camera_photo = st.camera_input("Take a photo of the book cover")
     if camera_photo is not None:
-        temp_path = "temp_camera_image.jpg"
-        with open(temp_path, "wb") as f:
-            f.write(camera_photo.getvalue())
-        _process_image(temp_path)
+        image = Image.open(camera_photo)
+        st.markdown("**Crop and adjust the image before proceeding:**")
+        cropped_img = streamlit_cropper.st_cropper(
+            image,
+            aspect_ratio=None,
+            box_color='#FF4B4B',
+            return_type='image',
+            realtime_update=True,
+            #min_container_width=300,
+        )
+        if cropped_img is not None:
+            buf = io.BytesIO()
+            cropped_img.save(buf, format="JPEG")
+            temp_path = f"temp_camera_image_{user_id}.jpg"
+            with open(temp_path, "wb") as f:
+                f.write(buf.getvalue())
+            _process_image(temp_path, user_id)
+            st.stop()
+    
 
 @st.dialog("Add a Book")
-def add_book()-> None:
+def add_book(user_id: str)-> None:
     option = st.radio(
         "Choose how to add a book:",
         ["Take a photo", "Upload a photo", "Enter manually"],
         horizontal=True,
         help="You can either take a photo of the book cover, upload an image, or enter the details manually."
     )
-    if option == "Take a photo":
-        _take_a_photo()
-    elif option == "Upload a photo":
-        _upload_book_cover()
+    if option == "Upload a photo":
+        _upload_book_cover(user_id)
+    elif option == "Take a photo":
+        _take_a_photo(user_id)
     elif option == "Enter manually":
-        _manual_entry()
+        _manual_entry(user_id)
     
 def display_book_image(book: Book):
     if book.image:
@@ -119,7 +142,15 @@ def edit_book_details(book: Book):
     new_genre = st.text_input("Genre", value=book.genre)
 
     if st.button("Save Changes", key=f"save_{book.uuid}", type="primary"):
-        update_book(book.uuid, new_title, new_author, new_tagline, new_genre)
+        # Convert to named params for clarity
+        update_book(
+            book_id=book.uuid,
+            user_id=book.user_id,
+            title=new_title,
+            author=new_author,
+            tagline=new_tagline,
+            genre=new_genre
+        )
         st.success("Book details updated")
 
 @st.dialog("Delete Book")
@@ -132,7 +163,7 @@ def delete_book(book: Book, on_delete=None):
         cancel = st.button("Cancel", key=f"cancel_delete_{book.uuid}")
 
     if confirm:
-        delete_book_from_db(book.uuid)
+        delete_book_from_db(book.uuid, user_id=book.user_id)
         st.success("Book deleted successfully.")
         if on_delete:
             on_delete()

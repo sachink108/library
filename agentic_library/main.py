@@ -3,6 +3,7 @@ import streamlit as st
 from agentic_library.book import add_book, delete_book, display_book_details, edit_book_details, display_book_image
 from agentic_library.sidebar import show_sidebar
 from agentic_library.db import get_books_from_db
+from agentic_library.db import get_user_by_email, add_user_to_db
 
 # --- Login Screen ---
 def login_screen():
@@ -39,12 +40,14 @@ if not st.user.is_logged_in:
     st.stop()
 else:
     st.sidebar.write(f"Welcome, {st.user.name}!")
+    add_user_to_db(st.user)
 
 if st.button("➕ Add a new book"):
-    add_book()
+    user_id = get_user_by_email(st.user.email)['user_id']
+    add_book(user_id=user_id)
 
 # --- Sidebar for Filters ---
-books = get_books_from_db()
+books = get_books_from_db(get_user_by_email(st.user.email)['user_id'])
 selected_author, selected_category = show_sidebar(st, books)
 
 # Display books

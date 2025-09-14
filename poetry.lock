@@ -1656,6 +1656,23 @@ snowflake = ["snowflake-connector-python (>=3.3.0) ; python_version < \"3.12\"",
 sql = ["SQLAlchemy (>=2.0.0)"]
 
 [[package]]
+name = "streamlit-cropper"
+version = "0.3.1"
+description = "A simple image cropper for Streamlit"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "streamlit_cropper-0.3.1-py3-none-any.whl", hash = "sha256:26630e5366c9f0f8ed391d8bd7ab8386acf42cd9f30dd6e708b9b32beeef57e1"},
+    {file = "streamlit_cropper-0.3.1.tar.gz", hash = "sha256:7d22befae2dd861ea9ac8ca65e1fa6c27af25e9350b365ee2d3d043d81ff76fe"},
+]
+
+[package.dependencies]
+numpy = "*"
+Pillow = "*"
+streamlit = "*"
+
+[[package]]
 name = "tenacity"
 version = "9.1.2"
 description = "Retry code until it succeeds"
@@ -1831,4 +1848,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "02883f154550054d65e224a3288a7dd22a76174ecb916aa3beba6fe11b32fa76"
+content-hash = "9c1b4fbbbb67736a9900792e4b7d3a71284c244c5b78c369370dba780643cfe7"

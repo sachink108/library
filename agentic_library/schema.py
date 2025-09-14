@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 class Book(BaseModel):
+    user_id: str = Field(..., description="ID of the user who owns the book")
     uuid: str = Field(..., description="Unique identifier for the book")
     title: str = Field(..., description="Title of the book")
     author: str = Field(..., description="Author of the book")
