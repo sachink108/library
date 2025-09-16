@@ -4,9 +4,13 @@ A simple project to manage and organize your personal book collection.
 
 ## Features
 
+
 - Add, edit, and remove books
-- Track reading status
+![alt text](images/image_add.png)
 - Search and filter books
+![alt text](images/image.png)
+- Edit and delete books
+![alt text](images/image_edit.png.png)
 
 ## Getting Started
 
