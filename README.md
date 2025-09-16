@@ -9,14 +9,14 @@ The My Library Project is a user-friendly application designed to help you catal
 ## Features
 
 - Search and filter books
-![alt text](images/library.png)
+![alt text](images/app.png)
 
 - Add a book by taking a picture, uploading an image or adding details manually
-![alt text](images/image_add.png)
+![alt text](images/add.png)
 
 - Edit books
 
-![alt text](images/image_edit.png)
+![alt text](images/edit.png)
 
 
 
