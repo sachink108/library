@@ -1,31 +1,55 @@
-# Personal Library Project
+# 📚 My Personal Library App
 
-The My Library Project is a user-friendly application designed to help you catalog, manage, and track your book collection. With intuitive features for searching, filtering, and editing book entries, you can easily organize your library. The app supports adding books by scanning covers, uploading images, or entering details manually, making it flexible for various use cases. Whether you're a casual reader or an avid collector, this project streamlines the process of maintaining your personal library.
+Welcome to **My Library** – your smart, AI-powered book catalog for readers, collectors, and lifelong learners!  
+Effortlessly organize, search, and manage your book collection with a beautiful interface and powerful features.
 
- **Authentication** The application supports Google login for secure and convenient authentication. You can sign in with your Google account to access the application.
+---
 
-**LLM** The application leverages Large Language Models (LLMs) to help identify books from their covers, providing accurate suggestions and streamlining the cataloging process.
+## ✨ Why You'll Love My Library
 
-## Features
+- **Instant Book Recognition:**  
+  Add books by scanning covers, uploading images, or entering details manually. Our LLM-powered assistant helps identify titles and authors from cover images!
 
-- Search and filter books
-![alt text](images/app.png)
+- **Smart Search & Filters:**  
+  Quickly find books by author, genre, or custom tags.  
+  ![Search and filter books](images/app.png)
 
-- Add a book by taking a picture, uploading an image or adding details manually
-![alt text](images/add.png)
+- **Flexible Book Entry:**  
+  Snap a photo, upload an image, or type in details – you choose!  
+  ![Add a book](images/add.png)
 
-- Edit books
+- **Easy Editing:**  
+  Update book info, change covers, or add notes anytime.  
+  ![Edit books](images/edit.png)
 
-![alt text](images/edit.png)
+- **Secure Google Login:**  
+  Sign in with your Google account for a personalized and safe experience.
 
+---
 
+## 🚀 Getting Started
 
-## Getting Started
+1. **Clone the repository:**  
+   `git clone https://github.com/yourusername/agentic-library.git`
+2. **Install dependencies:**  
+   `pip install -r requirements.txt`
+3. **Run the app:**  
+   `streamlit run agentic_library/main.py`
 
-1. Clone the repository.
-2. Install dependencies.
-3. Run the application.
+---
 
-## License
+## 🛡️ License
 
-MIT
+MIT – Free for personal and commercial use.
+
+---
+
+## 🤖 Powered By
+
+- **Streamlit** for a beautiful UI
+- **OpenAI LLMs** for book cover recognition
+- **Google OAuth** for secure authentication
+
+---
+
+> **Ready to rediscover your bookshelf? Start organizing with My Library today!**
