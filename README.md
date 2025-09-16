@@ -15,6 +15,7 @@ The My Library Project is a user-friendly application designed to help you catal
 ![alt text](images/image_add.png)
 
 - Edit books
+
 ![alt text](images/image_edit.png)
 
 
