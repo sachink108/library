@@ -7,23 +7,24 @@ Effortlessly organize, search, and manage your book collection with a beautiful 
 
 ## ✨ Why You'll Love My Library
 
-- **Instant Book Recognition:**  
-  Add books by scanning covers, uploading images, or entering details manually. Our LLM-powered assistant helps identify titles and authors from cover images!
+- **Secure Google Login:**  
+  Sign in with your Google account for a personalized and safe experience.
+  ![alt text](images/login_1.png)
+  <br>
+   ![alt text](images/login_2.png)
 
-- **Smart Search & Filters:**  
-  Quickly find books by author, genre, or custom tags.  
-  ![Search and filter books](images/app.png)
-
-- **Flexible Book Entry:**  
+- **Instant Book Recognition and Flexible Entry:**  
   Snap a photo, upload an image, or type in details – you choose!  
   ![Add a book](images/add.png)
+
+- **Smart Search & Filters:**  
+  Quickly find and filter books by author, genre.  
+  ![Search and filter books](images/app.png)
 
 - **Easy Editing:**  
   Update book info, change covers, or add notes anytime.  
   ![Edit books](images/edit.png)
 
-- **Secure Google Login:**  
-  Sign in with your Google account for a personalized and safe experience.
 
 ---
 

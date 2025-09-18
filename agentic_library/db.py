@@ -52,7 +52,6 @@ def get_user_by_email(email: str)-> dict | None:
             }
         return None
 
-# import streamlit as st
 def add_user_to_db(user)->None:
     # --- Check if user exists in DB, if not add ---
     user_email = user.email
@@ -85,6 +84,10 @@ def save_book_to_db(book:Book, user_id: str)  -> None:
                 user_id)
         )
         conn.commit()
+
+@st.cache_data(show_spinner=False)
+def get_books_from_db_cached(user_id: str) -> list[Book]:
+    return get_books_from_db(user_id)
 
 def get_books_from_db(user_id: str) -> list[Book]:
     books = []
