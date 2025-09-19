@@ -1,0 +1,16 @@
+# Ignore everything
+# *.txt
+*.env
+.env
+*.pyc
+
+.streamlit
+**/*.db
+*.bak
+temp_uploaded_image.jpg
+*.jpg
+*.jpeg
+*.png
+
+# images/ is NOT ignored
+!images/*.png
