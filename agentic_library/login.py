@@ -1,8 +1,24 @@
+"""
+This module provides a function to display a centered login screen in a Streamlit app.
+Functions:
+    centered_login_screen():
+        Renders a login interface centered on the page using Streamlit columns and custom HTML/CSS.
+        The interface includes:
+            - A title ("My Library")
+            - A subtitle prompting the user to log in with their Google account
+            - A "Login with Google" button
+        The button is styled and aligned using Streamlit's layout features and custom HTML.
+"""
+
 import streamlit as st
 
 
 # Center the title and login screen using Streamlit columns
 def centered_login_screen():
+    """
+    Display a centered login screen with a title and a Google login 
+    button using Streamlit columns and custom HTML/CSS.
+    """
     col1, col2, col3 = st.columns([2, 3, 2])
     with col2:
         st.markdown(

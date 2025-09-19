@@ -1,3 +1,25 @@
+"""
+Main Streamlit application for the Agentic Library.
+This script sets up the user interface for a personal library management app, allowing users to log in, view, add, edit, delete, and search for books. 
+It integrates with custom modules for book management, user authentication, sidebar filters, and database operations.
+Features:
+- Custom page styling and configuration.
+- User authentication and session management.
+- Sidebar with author and genre filters.
+- Top bar for adding new books and searching.
+- Dynamic display of books with options to view details, edit, or delete.
+- Integration with a database for persistent storage of books and users.
+Modules imported:
+- `agentic_library.book`: Functions for book operations (add, delete, edit, display).
+- `agentic_library.sidebar`: Sidebar filter UI.
+- `agentic_library.db`: Database operations for books and users.
+- `agentic_library.login`: Custom login screen.
+Usage:
+Run this script with Streamlit to launch the Agentic Library web app.
+Install: poetry install
+Run: poetry run streamlit run agentic_library/main.py
+"""
+
 import streamlit as st
 
 from agentic_library.book import add_book, delete_book, display_book_details, edit_book_details, display_book_image

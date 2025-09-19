@@ -1,3 +1,10 @@
+"""
+book_agent.py
+-----------------
+This module provides functions for identifying book details from cover images using OpenAI's vision models.
+It includes utilities for reading image files, calling the OpenAI API, and returning structured book metadata.
+Intended for use in the Streamlit personal library app.
+"""
 import re
 import openai
 import base64
@@ -10,11 +17,25 @@ from agentic_library.schema import Book
 client = openai.OpenAI(api_key=st.secrets["OPENAPI"]["OPENAI_API_KEY"])  # Create a client instance
 
 def read_image_file(image_path) -> bytes:
+    """
+    Reads an image file from the given path and returns its bytes.
+    Args:
+        image_path (str): Path to the image file.
+    Returns:
+        bytes: The image data in bytes.
+    """
     with open(image_path, "rb") as f:
         return f.read()
 
 
 def _call_openai_api(image_b64: str) -> str:
+    """
+    Calls the OpenAI API with a base64-encoded image to identify book details.
+    Args:
+        image_b64 (str): Base64-encoded image string.
+    Returns:
+        str: The response from the OpenAI API (expected to be a JSON string).
+    """
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
@@ -29,6 +50,13 @@ def _call_openai_api(image_b64: str) -> str:
     return response.choices[0].message.content
 
 def _call_openai_api_mock(image_b64: str) -> str:
+    """
+    Mock function to simulate OpenAI API response for testing purposes.
+    Args:
+        image_b64 (str): Base64-encoded image string.
+    Returns:
+        str: A mock JSON string with book details.
+    """
     return """
     ```json
     {
@@ -41,6 +69,14 @@ def _call_openai_api_mock(image_b64: str) -> str:
     """
 
 def identify_book_details(image_path, user_id: str) -> Book:
+    """
+    Identifies book details from a cover image using OpenAI's vision model.
+    Args:
+        image_path (str): Path to the image file.
+        user_id (str): ID of the user adding the book.
+    Returns:
+        Book: A Book object populated with details extracted from the image.
+    """
     image_bytes = read_image_file(image_path)
     image_b64 = base64.b64encode(image_bytes).decode()
     details = _call_openai_api(image_b64)
@@ -56,3 +92,4 @@ def identify_book_details(image_path, user_id: str) -> Book:
         return Book(**book_details)
 
     raise ValueError("No JSON block found in the response.")
+

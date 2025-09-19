@@ -1,3 +1,21 @@
+"""
+Module for managing book entries in the agentic_library application using Streamlit dialogs.
+This module provides functions and dialogs for adding, editing, displaying, and deleting books.
+Books can be added by uploading a cover image, taking a photo, or manual entry. The module
+supports image cropping, book detail identification, and database operations.
+Functions:
+    _process_image(temp_path, user_id): Processes an uploaded or captured image to identify book details.
+    _upload_book_cover(user_id): Handles uploading a book cover image and triggers processing.
+    _manual_entry(user_id): Allows manual entry of book details, with optional cover image upload.
+    _take_a_photo(user_id): Captures a photo using the camera, allows cropping, and processes the image.
+    add_book(user_id): Streamlit dialog for adding a book via photo, upload, or manual entry.
+    display_book_image(book): Displays the book's cover image in the UI.
+    display_book_details(book): Streamlit dialog for displaying book details.
+    edit_book_details(book): Streamlit dialog for editing book details.
+    delete_book(book, on_delete): Streamlit dialog for confirming and deleting a book.
+Note:
+    All dialogs use Streamlit's dialog API for interactive UI components.
+"""
 import os
 import streamlit as st
 import base64
@@ -11,6 +29,11 @@ from agentic_library.db import delete_book_from_db
 import streamlit_cropper
 
 def _process_image(temp_path, user_id: str):
+    """
+    Processes an uploaded or captured image to identify book details using 
+    the book agent.
+    Allows user to verify and update details before saving to the database.
+    """
     with st.spinner("Identifying book details...", show_time=True):
         try:
             book = identify_book_details(temp_path, user_id=user_id)
@@ -41,6 +64,10 @@ def _process_image(temp_path, user_id: str):
         os.remove(temp_path)
 
 def _upload_book_cover(user_id: str):
+    """
+    Handles uploading a book cover image and triggers processing for 
+    book detail identification.
+    """
     uploaded_file = st.file_uploader("Upload a book cover image", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         image_bytes = uploaded_file.read()
@@ -50,6 +77,10 @@ def _upload_book_cover(user_id: str):
         _process_image(temp_path, user_id)
 
 def _manual_entry(user_id: str):
+    """
+    Allows manual entry of book details, with optional cover image upload.
+    Saves the book to the database after validation.
+    """
     title = st.text_input("Title")
     author = st.text_input("Author")
     tagline = st.text_input("Tagline")
@@ -76,6 +107,10 @@ def _manual_entry(user_id: str):
             st.stop()
 
 def _take_a_photo(user_id: str):
+    """
+    Captures a photo using the camera, allows cropping, and processes the 
+    image for book detail identification.
+    """
     camera_photo = st.camera_input("Take a photo of the book cover")
     if camera_photo is not None:
         image = Image.open(camera_photo)
@@ -99,7 +134,11 @@ def _take_a_photo(user_id: str):
     
 
 @st.dialog("Add a Book")
-def add_book(user_id: str)-> None:
+def add_book(user_id: str) -> None:
+    """
+    Streamlit dialog for adding a book via photo, upload, or manual entry.
+    Presents options and triggers the appropriate entry method.
+    """
     option = st.radio(
         "Choose how to add a book:",
         ["Take a photo", "Upload a photo", "Enter manually"],
@@ -114,6 +153,9 @@ def add_book(user_id: str)-> None:
         _manual_entry(user_id)
     
 def display_book_image(book: Book):
+    """
+    Displays the book's cover image in the UI, resizing for display.
+    """
     if book.image:
         image_data = base64.b64decode(book.image)
         image = Image.open(io.BytesIO(image_data))
@@ -124,6 +166,9 @@ def display_book_image(book: Book):
 
 @st.dialog("Book Details")
 def display_book_details(book: Book):
+    """
+    Streamlit dialog for displaying book details including title, author, tagline, genre, and cover image.
+    """
     col1, col2 = st.columns([2, 1])
     with col1:
         st.markdown(f"### {book.title}")
@@ -136,6 +181,11 @@ def display_book_details(book: Book):
 
 @st.dialog("Edit Book Details")
 def edit_book_details(book: Book):
+    """
+    Streamlit dialog for editing book details. Allows user to update
+    title, author, tagline, and genre.
+    Saves changes to the database.
+    """
     new_title = st.text_input("Title", value=book.title)
     new_author = st.text_input("Author", value=book.author)
     new_tagline = st.text_input("Tagline", value=book.tagline)
@@ -155,6 +205,10 @@ def edit_book_details(book: Book):
 
 @st.dialog("Delete Book")
 def delete_book(book: Book, on_delete=None):
+    """
+    Streamlit dialog for confirming and deleting a book from the database.
+    Calls on_delete callback if provided.
+    """
     st.markdown(f"Are you sure you want to delete **{book.title}** by **{book.author}**?")
     col1, col2 = st.columns(2)
     with col1:
